@@ -34,7 +34,7 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 # Remove empty entries
-ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h]
+ALLOWED_HOSTS = ["backendapi-tv2v.onrender.com","127.0.0.1", "localhost"]
 # =========================================
 
 
