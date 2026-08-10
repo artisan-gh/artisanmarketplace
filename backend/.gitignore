@@ -10,7 +10,26 @@ env/
 
 # Django
 db.sqlite3
-media/
+# User-uploaded media files
+media/uploads/
+
+# Uploaded user media
+media/kyc/*
+media/profiles/*
+
+# Keep Django media app source code
+!media/__init__.py
+!media/admin.py
+!media/apps.py
+!media/models.py
+!media/serializers.py
+!media/tests.py
+!media/urls.py
+!media/views.py
+!media/migrations/
+!media/migrations/__init__.py
+!media/migrations/*.py
+
 staticfiles/
 
 # Environment variables
