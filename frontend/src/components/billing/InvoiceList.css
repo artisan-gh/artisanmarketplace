@@ -1,0 +1,334 @@
+/* ==========================================================================
+   InvoiceList.css
+   Design language: "ledger" — a quiet, precise financial-record aesthetic.
+   Palette:  ink #14213D · canvas #F7F8FB · surface #FFFFFF
+             border #E3E6EE · muted #6B7280 · accent (ledger teal) #12786A
+   Type:     Inter for UI text and tabular data throughout.
+   Signature: split-rendered currency (muted symbol / bold integer / quiet
+              decimals) so the amount column reads like a real ledger.
+   ========================================================================== */
+
+.invoice-list {
+  --ink: #14213d;
+  --canvas: #f7f8fb;
+  --surface: #ffffff;
+  --border: #e3e6ee;
+  --border-strong: #d3d7e3;
+  --muted: #6b7280;
+  --muted-soft: #9aa1af;
+  --accent: #12786a;
+  --accent-strong: #0d5c51;
+  --accent-soft: #e6f3f1;
+
+  --status-draft-fg: #52525b;
+  --status-draft-bg: #f1f2f4;
+  --status-sent-fg: #2554c7;
+  --status-sent-bg: #eef3ff;
+  --status-paid-fg: #0f8f5f;
+  --status-paid-bg: #e8f8f0;
+  --status-overdue-fg: #c02b2b;
+  --status-overdue-bg: #fdeeee;
+  --status-inactive-fg: #8b8f98;
+  --status-inactive-bg: #f2f2f4;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 2px rgba(20, 33, 61, 0.06);
+  --shadow-md: 0 4px 16px rgba(20, 33, 61, 0.08);
+
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--canvas);
+  padding: 24px;
+  border-radius: var(--radius-md);
+}
+
+/* ---------- Toolbar ---------- */
+
+.invoice-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.invoice-search {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 220px;
+}
+
+.invoice-search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--muted-soft);
+  pointer-events: none;
+}
+
+.invoice-search input {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.invoice-search input::placeholder {
+  color: var(--muted-soft);
+}
+
+.invoice-search input:focus,
+.invoice-status-select:focus,
+.invoice-new-btn:focus-visible,
+.invoice-action:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.invoice-status-select {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.invoice-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.invoice-new-btn:hover {
+  background: var(--accent-strong);
+}
+
+.invoice-new-btn:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Table shell ---------- */
+/* These rules style the underlying <table> markup rendered by DataTable.
+   If DataTable's internal class names differ, only the selectors below
+   need adjusting — the visual tokens above stay the same. */
+
+.invoice-table-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.invoice-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.invoice-table-wrapper thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--canvas);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.invoice-table-wrapper tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.invoice-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.invoice-table-wrapper tbody tr {
+  transition: background 0.12s ease;
+}
+
+.invoice-table-wrapper tbody tr:hover {
+  background: var(--canvas);
+}
+
+/* ---------- Cell content ---------- */
+
+.invoice-number-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.invoice-number-link:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.invoice-customer {
+  color: var(--ink);
+}
+
+/* Signature detail: the amount reads like a typeset ledger entry —
+   a quiet currency mark, a bold whole number, and soft decimals,
+   all locked to tabular figures so columns of numbers stay aligned. */
+.invoice-amount {
+  display: inline-flex;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.invoice-amount__symbol {
+  color: var(--muted-soft);
+  font-weight: 500;
+  margin-right: 2px;
+}
+
+.invoice-amount__whole {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.invoice-amount__decimals {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.invoice-due-date {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Status badge accent ---------- */
+/* Wraps StatusBadge to guarantee ledger-consistent color even if the
+   badge component's own palette differs. */
+
+.invoice-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.invoice-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.invoice-status--draft { color: var(--status-draft-fg); }
+.invoice-status--sent { color: var(--status-sent-fg); }
+.invoice-status--paid { color: var(--status-paid-fg); }
+.invoice-status--overdue { color: var(--status-overdue-fg); }
+.invoice-status--inactive { color: var(--status-inactive-fg); }
+
+/* ---------- Row actions ---------- */
+
+.invoice-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.invoice-action {
+  font-size: 13px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 2px;
+}
+
+.invoice-action--view,
+.invoice-action--edit {
+  color: var(--muted);
+}
+
+.invoice-action--view:hover,
+.invoice-action--edit:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.invoice-action--positive {
+  color: var(--accent);
+}
+
+.invoice-action--positive:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.invoice-action--danger {
+  color: var(--status-overdue-fg);
+}
+
+.invoice-action--danger:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .invoice-list {
+    padding: 16px;
+  }
+
+  .invoice-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .invoice-new-btn {
+    justify-content: center;
+  }
+
+  .invoice-table-wrapper {
+    overflow-x: auto;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .invoice-table-wrapper tbody tr,
+  .invoice-new-btn {
+    transition: none;
+  }
+}

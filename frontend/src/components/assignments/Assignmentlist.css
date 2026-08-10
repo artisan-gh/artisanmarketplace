@@ -1,0 +1,297 @@
+/* ─── Fonts ──────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ─── Light theme – direct, no dark fallbacks ───────────── */
+.assignment-list-page {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --text: #0f172a;
+  --text-muted: #334155;
+  --text-dim: #64748b;
+  --text-faint: #94a3b8;
+  --indigo: #4f46e5;
+  --blue: #3b82f6;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 9px;
+
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 28px clamp(16px, 4vw, 40px) 60px;
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+.assignment-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.assignment-list-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--text);
+}
+
+.assignment-list-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+/* ─── Logout button ───────────────────────────────────────── */
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.logout-btn:hover {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.logout-btn:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
+}
+
+.logout-btn__icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* ─── Filter row ─────────────────────────────────────────── */
+.assignment-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.assignment-filters__search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.assignment-filters__search input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--text);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.assignment-filters__search input:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.assignment-filters__search input::placeholder {
+  color: var(--text-faint);
+}
+
+.assignment-select {
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--text);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 34px 10px 14px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23475569' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.assignment-select:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.assignment-select option {
+  background: #ffffff;
+  color: var(--text);
+}
+
+/* ─── Table wrapper ──────────────────────────────────────── */
+.assignment-table-wrap {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.assignment-table-wrap:hover {
+  border-color: var(--border-hover);
+}
+
+.assignment-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.assignment-table-wrap thead th {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.assignment-table-wrap tbody td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.assignment-table-wrap tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.assignment-table-wrap tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ─── Cell content ───────────────────────────────────────── */
+.assignment-link {
+  color: var(--indigo);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.assignment-link:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.assignment-unassigned {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.assignment-date {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.assignment-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.assignment-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.assignment-action__icon {
+  width: 12px;
+  height: 12px;
+}
+
+.assignment-action--view {
+  color: var(--indigo);
+}
+
+.assignment-action--view:hover {
+  background: rgba(79, 70, 229, 0.06);
+  border-color: var(--indigo);
+}
+
+.assignment-action--assign {
+  color: #0f8f5f;
+}
+
+.assignment-action--assign:hover {
+  background: rgba(15, 143, 95, 0.06);
+  border-color: #0f8f5f;
+}
+
+/* ─── State banner (error) ───────────────────────────────── */
+.state-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+}
+
+.state-banner__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.state-banner p {
+  margin: 0;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .assignment-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .assignment-filters__select-wrap {
+    width: 100%;
+  }
+  .assignment-select {
+    width: 100%;
+  }
+}

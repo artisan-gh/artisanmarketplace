@@ -1,0 +1,782 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+/* ─────────────────────────────────────────────────────────
+   Find Artisans — visual system
+   A trades marketplace reads as trustworthy through
+   restraint: one confident accent, real hierarchy, quiet
+   surfaces. Manrope carries the headline weight; Inter runs
+   the UI. Cards keep a single softened "hand-cut" corner —
+   the one signature flourish — everything else stays quiet.
+
+   Palette
+   --ink        #0b0e16  page background
+   --surface    #12151f  card / panel background
+   --line       rgba(255,255,255,.08)   hairline borders
+   --text       #eef0f5  primary text
+   --text-mute  #8891a3  secondary text
+   --gold       #d9a441  accent — brass / craft nameplate
+   --gold-soft  rgba(217,164,65,.14)
+   ───────────────────────────────────────────────────────── */
+
+:root {
+  --ink: #0b0e16;
+  --surface: #12151f;
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #eef0f5;
+  --text-mute: #8891a3;
+  --gold: #d9a441;
+  --gold-light: #f0d9a8;
+  --gold-soft: rgba(217, 164, 65, 0.14);
+}
+
+.art-page {
+  position: relative;
+  min-height: 100vh;
+  background: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 2rem 1.25rem 4rem;
+}
+
+@media (min-width: 768px) {
+  .art-page {
+    padding: 3rem 2.5rem 5rem;
+  }
+}
+
+.art-container {
+  position: relative;
+  max-width: 78rem;
+  margin: 0 auto;
+}
+
+/* A single quiet gradient wash at the top of the page —
+   no scattered neon blobs competing for attention. */
+.art-topline {
+  position: absolute;
+  top: -3rem;
+  left: 0;
+  right: 0;
+  height: 22rem;
+  background: radial-gradient(60% 100% at 50% 0%, rgba(217, 164, 65, 0.07), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Breadcrumb ──────────────────────────────────────────── */
+.art-eyebrow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #626b7d;
+  margin-bottom: 1rem;
+}
+
+.art-eyebrow-sep {
+  font-size: 0.5rem;
+  color: #3a4054;
+}
+
+.art-eyebrow-current {
+  color: #b6bcc9;
+}
+
+/* ─── Header ──────────────────────────────────────────────── */
+.art-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 768px) {
+  .art-header {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.art-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 2.25rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #f6f7fa;
+}
+
+.art-subtitle {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--text-mute);
+  max-width: 32rem;
+}
+
+.art-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.art-count-number {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 1.375rem;
+  color: var(--gold);
+}
+
+.art-count-label {
+  font-size: 0.8125rem;
+  color: #626b7d;
+}
+
+/* ─── Toolbar ─────────────────────────────────────────────── */
+.art-toolbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.art-search {
+  position: relative;
+  flex: 1;
+}
+
+.art-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8125rem;
+  color: #565e70;
+}
+
+.art-search-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem 1rem 0.75rem 2.625rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.art-search-input::placeholder {
+  color: #565e70;
+}
+
+.art-search-input:focus {
+  border-color: rgba(217, 164, 65, 0.5);
+  background: #151926;
+}
+
+.art-filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.125rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #b6bcc9;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.art-filter-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  color: var(--text);
+}
+
+.art-filter-toggle.is-active {
+  border-color: rgba(217, 164, 65, 0.45);
+  background: var(--gold-soft);
+  color: var(--gold-light);
+}
+
+.art-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #1a1305;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+/* ─── Filter panel ────────────────────────────────────────── */
+.art-filter-panel {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.art-filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.125rem;
+}
+
+@media (min-width: 768px) {
+  .art-filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .art-filter-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.art-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #626b7d;
+  margin-bottom: 0.5rem;
+}
+
+.art-input {
+  width: 100%;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.art-input::placeholder {
+  color: #565e70;
+}
+
+.art-input:focus {
+  border-color: rgba(217, 164, 65, 0.5);
+}
+
+select.art-input option {
+  background: var(--surface);
+}
+
+.art-input-prefix {
+  position: relative;
+}
+
+.art-input-prefix > span {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8125rem;
+  color: #626b7d;
+  pointer-events: none;
+}
+
+.art-input--prefixed {
+  padding-left: 1.75rem;
+}
+
+.art-filter-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.art-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  color: #b6bcc9;
+  cursor: pointer;
+}
+
+.art-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--gold);
+}
+
+.art-clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-mute);
+  transition: color 0.2s ease;
+}
+
+.art-clear-btn:hover {
+  color: var(--text);
+}
+
+/* ─── Active filter chips ─────────────────────────────────── */
+.art-chip-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.art-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  border: 1px solid rgba(217, 164, 65, 0.25);
+  color: var(--gold-light);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.art-chip--clear {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text-mute);
+}
+
+.art-chip--clear:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* ─── Grid ────────────────────────────────────────────────── */
+.art-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.125rem;
+}
+
+@media (min-width: 768px) {
+  .art-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .art-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ─── Card shell — the one signature flourish ────────────────
+   A hairline border, one softened corner (a nod to a
+   hand-stamped trade tag), and a quiet gold edge that
+   appears only on hover. No permanent glow — the card earns
+   attention through content, not decoration.                 */
+.art-card-shell {
+  position: relative;
+  border-radius: 20px 20px 20px 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.art-card-shell > * {
+  display: block;
+  height: 100%;
+}
+
+.art-card-shell:hover {
+  transform: translateY(-4px);
+  border-radius: 6px 20px 20px 20px;
+  border-color: rgba(217, 164, 65, 0.35);
+  box-shadow: 0 16px 32px -16px rgba(0, 0, 0, 0.55);
+}
+
+.art-card-shell:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* ─── Card media ──────────────────────────────────────────── */
+.art-card-media {
+  position: relative;
+  height: 10rem;
+  background: linear-gradient(150deg, #1a2033 0%, #0f1119 100%);
+  overflow: hidden;
+}
+
+.art-card-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.art-card-media-fallback {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.art-card-monogram {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 2.75rem;
+  letter-spacing: -0.02em;
+  color: rgba(217, 164, 65, 0.18);
+}
+
+/* Fades the base of the image into the card so the avatar
+   ring below can overlap it cleanly, regardless of the
+   photo's own contrast. */
+.art-card-media-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--surface) 0%, rgba(18, 21, 31, 0) 55%);
+  pointer-events: none;
+}
+
+.art-badge-available {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(9, 20, 15, 0.72);
+  
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #6ee7b7;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.3rem 0.625rem;
+  border-radius: 999px;
+}
+
+.art-badge-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.18);
+}
+
+/* ─── Card body ───────────────────────────────────────────── */
+.art-card-body {
+  position: relative;
+  padding: 0 1.125rem 1.125rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.art-card-top-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.625rem;
+  margin-top: -1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.art-avatar-ring {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  border: 3px solid var(--surface);
+  background: linear-gradient(135deg, rgba(217, 164, 65, 0.28), rgba(217, 164, 65, 0.06));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.6);
+}
+
+.art-avatar-fallback {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--gold-light);
+}
+
+.art-rating-badge {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  background: var(--gold-soft);
+  border: 1px solid rgba(217, 164, 65, 0.22);
+  padding: 0.3rem 0.55rem 0.3rem 0.5rem;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+.art-rating-badge svg {
+  font-size: 0.625rem;
+  color: var(--gold);
+}
+
+.art-rating-badge--new {
+  color: var(--text-mute);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--line);
+  font-weight: 600;
+}
+
+.art-card-name {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: #f6f7fa;
+  transition: color 0.2s ease;
+}
+
+.group:hover .art-card-name {
+  color: var(--gold-light);
+}
+
+.art-card-trade {
+  font-size: 0.8125rem;
+  color: var(--text-mute);
+  margin-top: 0.125rem;
+}
+
+.art-category-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.art-category-pill {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #b6bcc9;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.art-category-pill--muted {
+  color: #626b7d;
+}
+
+.art-card-footer {
+  margin-top: auto;
+  padding-top: 0.875rem;
+  margin-top: 0.875rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.art-card-location {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #626b7d;
+}
+
+.art-card-location svg {
+  color: rgba(217, 164, 65, 0.6);
+  font-size: 0.6875rem;
+}
+
+.art-card-price {
+  font-size: 0.75rem;
+  color: var(--text-mute);
+  white-space: nowrap;
+}
+
+.art-card-price strong {
+  font-family: 'Manrope', sans-serif;
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* ─── Skeleton loading state ──────────────────────────────── */
+.art-skeleton-card {
+  padding: 1.125rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.art-skeleton-media {
+  height: 8rem;
+  border-radius: 12px;
+  background: linear-gradient(100deg, #171b28 30%, #1e2333 50%, #171b28 70%);
+  background-size: 200% 100%;
+  animation: art-shimmer 1.8s ease-in-out infinite;
+}
+
+.art-skeleton-line {
+  height: 0.625rem;
+  border-radius: 999px;
+  background: linear-gradient(100deg, #171b28 30%, #1e2333 50%, #171b28 70%);
+  background-size: 200% 100%;
+  animation: art-shimmer 1.8s ease-in-out infinite;
+}
+
+.art-skeleton-line--title {
+  width: 70%;
+  height: 0.75rem;
+}
+
+.art-skeleton-line--sub {
+  width: 45%;
+}
+
+.art-skeleton-line--tag {
+  width: 30%;
+  margin-top: 0.25rem;
+}
+
+@keyframes art-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── Empty state ─────────────────────────────────────────── */
+.art-empty {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 5rem 1.5rem;
+}
+
+.art-empty-badge {
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px 16px 16px 5px;
+  background: var(--gold-soft);
+  border: 1px solid rgba(217, 164, 65, 0.25);
+  color: var(--gold);
+}
+
+.art-empty-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--text);
+}
+
+.art-empty-sub {
+  font-size: 0.875rem;
+  color: var(--text-mute);
+  margin-top: 0.375rem;
+}
+
+.art-empty-clear {
+  margin-top: 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.art-empty-clear:hover {
+  color: var(--gold-light);
+}
+
+/* ─── Load more ───────────────────────────────────────────── */
+.art-load-more {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.art-load-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #1a1305;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+}
+
+.art-load-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.art-load-btn:focus-visible,
+.art-filter-toggle:focus-visible,
+.art-search-input:focus-visible,
+.art-input:focus-visible,
+.art-clear-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.art-load-btn:disabled {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-card-shell,
+  .art-load-btn,
+  .art-skeleton-media,
+  .art-skeleton-line {
+    transition: none;
+    animation: none;
+  }
+}

@@ -1,0 +1,161 @@
+.admin-withdrawals-page {
+  min-height: 100vh;
+  background: #0b0e16;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.admin-withdrawals-container {
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.admin-withdrawals-header {
+  margin-bottom: 2rem;
+}
+
+.admin-withdrawals-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  color: #f6f7fa;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-withdrawals-count {
+  font-size: 1rem;
+  background: #d9a441;
+  color: #1a1305;
+  padding: 0.1rem 0.65rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.admin-withdrawals-sub {
+  color: #8891a3;
+  font-size: 0.9375rem;
+  margin-top: 0.25rem;
+}
+
+.admin-withdrawals-empty,
+.admin-withdrawals-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: #626b7d;
+}
+
+.admin-withdrawals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-withdrawal-item {
+  background: #12151f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: border-color 0.2s;
+}
+
+.admin-withdrawal-item:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.admin-withdrawal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-withdrawal-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #f6f7fa;
+  font-weight: 500;
+}
+
+.admin-withdrawal-email {
+  font-size: 0.875rem;
+}
+
+.admin-withdrawal-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+  color: #8891a3;
+}
+
+.admin-withdrawal-amount {
+  color: #f6f7fa;
+  font-weight: 600;
+}
+
+.admin-withdrawal-reference {
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.admin-withdrawal-date {
+  color: #626b7d;
+}
+
+.admin-withdrawal-actions {
+  flex-shrink: 0;
+}
+
+.admin-withdrawal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: filter 0.2s;
+}
+
+.admin-withdrawal-btn--approve {
+  background: #d9a441;
+  color: #1a1305;
+}
+
+.admin-withdrawal-btn--approve:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.admin-withdrawal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-withdrawal-btn svg {
+  font-size: 1rem;
+}
+
+.admin-withdrawals-access-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 0.75rem;
+  color: #626b7d;
+}

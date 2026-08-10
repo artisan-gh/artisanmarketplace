@@ -1,0 +1,472 @@
+/* ==========================================================================
+   Register.css — Artisan onboarding
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root {
+  --bg: #0E1320;
+  --surface: #171E30;
+  --surface-2: #1D2740;
+  --field: #0B111E;
+  --field-hover: #111A2E;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  --amber: #FFB020;
+  --amber-dim: #B9821A;
+  --orange: #FF5A36;
+  --teal: #2BD4A8;
+  --red: #FF5A5A;
+
+  --text: #F5F7FB;
+  --text-muted: #96A0B7;
+  --text-faint: #5C6580;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+/* Page shell ------------------------------------------------------------ */
+.login-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+.register-page { padding: 90px 20px 60px; align-items: flex-start; }
+
+.glow-field { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.35; }
+.glow-blue   { width: 480px; height: 480px; top: -140px; left: -120px; background: var(--amber); opacity: 0.16; }
+.glow-purple { width: 420px; height: 420px; bottom: -160px; right: -100px; background: var(--orange); opacity: 0.13; }
+.glow-indigo { width: 360px; height: 360px; top: 40%; right: 15%; background: var(--teal); opacity: 0.08; }
+
+/* Card -------------------------------------------------------------- */
+.login-card-wrap { position: relative; width: 100%; max-width: 620px; z-index: 1; }
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 44px 44px 38px;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.65);
+}
+
+/* Brand ---------------------------------------------------------------- */
+.brand { text-align: center; margin-bottom: 8px; }
+.brand-badge {
+  width: 46px; height: 46px;
+  display: grid; place-items: center;
+  margin: 0 auto 16px;
+  background: var(--amber);
+  color: #17110A;
+  border-radius: 10px;
+  font-size: 1.1rem;
+}
+.brand h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+.brand-gradient-text {
+  background: linear-gradient(100deg, var(--amber), var(--orange));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.brand p { color: var(--text-muted); font-size: 0.92rem; margin: 0; }
+
+.form-heading {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber);
+  text-align: center;
+  margin: 26px 0 22px;
+}
+.form-heading::before,
+.form-heading::after { content: '— '; color: var(--text-faint); }
+.form-heading::after { content: ' —'; }
+
+/* Error banner ------------------------------------------------------ */
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 90, 90, 0.1);
+  border: 1px solid rgba(255, 90, 90, 0.3);
+  color: #FFB3B3;
+  font-size: 0.85rem;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.error-banner svg { flex: none; margin-top: 2px; color: var(--red); }
+
+/* Form layout --------------------------------------------------------- */
+.login-form { display: grid; gap: 20px; }
+.field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+.field-group { display: grid; gap: 8px; }
+.login-page .field-label,
+.register-page .field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--amber) !important;
+}
+
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-faint);
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ─── Input styles – dark background, visible text ─────────── */
+.text-input,
+.login-page .text-input,
+.register-page .text-input,
+select.text-input,
+input.text-input {
+  width: 100%;
+  background: var(--field) !important;
+  background-color: var(--field) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  padding: 12px 14px 12px 40px;
+  border-radius: 9px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none; /* ✅ property order fixed */
+}
+
+/* Fix for autofill styles that might be overriding */
+.text-input:-webkit-autofill,
+.text-input:-webkit-autofill:hover,
+.text-input:-webkit-autofill:focus,
+.text-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--field) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  background-color: var(--field) !important;
+  background: var(--field) !important;
+}
+
+.text-input::placeholder {
+  color: var(--text-faint) !important;
+  opacity: 1;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--amber) !important;
+  box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.16);
+}
+
+.text-input.has-toggle { padding-right: 42px; }
+
+/* ─── Select dropdown ───────────────────────────────────────── */
+.select-input,
+select.text-input {
+  -webkit-appearance: none;
+  appearance: none; /* ✅ order fixed */
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-faint) 50%),
+                    linear-gradient(135deg, var(--text-faint) 50%, transparent 50%);
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.select-input option,
+select.text-input option {
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 8px;
+}
+
+/* ─── Fix for date input ───────────────────────────────────── */
+input[type="date"].text-input {
+  color-scheme: dark;
+  background-color: var(--field) !important;
+  color: var(--text) !important;
+}
+input[type="date"].text-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+/* ─── Password toggle ───────────────────────────────────────── */
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+  z-index: 2;
+}
+.password-toggle:hover { color: var(--amber); }
+
+/* File inputs --------------------------------------------------------- */
+.file-wrap {
+  border: 1px dashed var(--border-strong);
+  border-radius: 9px;
+  padding: 12px 14px 12px 40px;
+  background: var(--field);
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.file-input {
+  flex: 1;
+  min-width: 160px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0;
+}
+.file-input::file-selector-button {
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.file-input::file-selector-button:hover { border-color: var(--amber); }
+.file-name {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--teal);
+  width: 100%;
+}
+
+/* Section dividers — ruled form tabs ---------------------------------- */
+.section-divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 6px 0 -4px;
+}
+.section-divider::before {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--amber);
+  background: var(--surface);
+  padding: 0 12px 0 0;
+  white-space: nowrap;
+}
+
+/* Availability / skills — stamp-style toggles -------------------------- */
+.availability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 8px;
+}
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkbox-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.checkbox-label input { position: absolute; opacity: 0; pointer-events: none; }
+.checkbox-label:has(input:checked),
+.checkbox-label.active {
+  border-color: var(--amber);
+  background: rgba(255, 176, 32, 0.1);
+  color: var(--amber);
+}
+.checkbox-label:hover { border-color: var(--border-strong); }
+.checkbox-text { font-weight: 500; }
+
+.helper-text {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  margin: 2px 0 0;
+}
+.helper-text--error { color: var(--red); }
+
+/* Submit ------------------------------------------------------------ */
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: var(--amber);
+  color: #17110A;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.96rem;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: box-shadow 0.18s ease, opacity 0.18s ease;
+}
+.submit-btn:hover { box-shadow: 0 10px 30px rgba(255, 176, 32, 0.3); }
+.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(23, 17, 10, 0.3);
+  border-top-color: #17110A;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* Divider + socials --------------------------------------------------- */
+.divider-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 26px 0 18px;
+}
+.divider-row::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: var(--border);
+}
+.divider-label {
+  position: relative;
+  background: var(--surface);
+  padding: 0 14px;
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+.social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px;
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.social-btn:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.social-btn svg { width: 18px; height: 18px; }
+
+.login-footer { text-align: center; margin-top: 22px; }
+.login-footer p { color: var(--text-muted); font-size: 0.88rem; }
+.signup-link { color: var(--amber); font-weight: 600; }
+.signup-link:hover { text-decoration: underline; }
+
+/* Focus visibility (a11y) ---------------------------------------------- */
+.login-page :focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* ─── Hover and general input overrides ──────────────────────── */
+.text-input:hover,
+.login-page .text-input:hover,
+.register-page .text-input:hover {
+  background-color: var(--field-hover) !important;
+  background: var(--field-hover) !important;
+}
+
+input,
+select,
+textarea,
+button {
+  background: var(--field);
+  color: var(--text);
+}
+
+/* ─── Fix calendar picker in dark mode ──────────────────────── */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: var(--text) !important;
+  background: var(--field) !important;
+}
+
+/* Responsive ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .login-card { padding: 32px 24px 30px; }
+  .field-grid-2, .field-grid-3 { grid-template-columns: 1fr; }
+  .social-grid { grid-template-columns: 1fr; }
+  .register-page { padding: 70px 16px 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+}

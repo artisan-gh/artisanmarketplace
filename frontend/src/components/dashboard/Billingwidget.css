@@ -1,0 +1,148 @@
+/* src/components/billing/BillingWidget.css */
+
+.billing-widget {
+  background: var(--surface, #171E30);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.09));
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  color: var(--text, #F5F7FB);
+}
+
+.billing-widget__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.billing-widget__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.billing-widget__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted, #96A0B7);
+  margin: 0.2rem 0 0;
+}
+
+.billing-widget__updated {
+  font-size: 0.75rem;
+  color: var(--text-faint, #5C6580);
+  background: var(--field, #0B111E);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.billing-widget__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.billing-stat {
+  background: var(--field, #0B111E);
+  padding: 1rem 1rem 0.75rem;
+  border-radius: 10px;
+  border-left: 3px solid var(--stat-color, #3b82f6);
+  transition: background 0.15s;
+}
+
+.billing-stat:hover {
+  background: var(--field-hover, #111A2E);
+}
+
+.billing-stat--warning {
+  --stat-color: #eab308;
+}
+
+.billing-stat--info {
+  --stat-color: #3b82f6;
+}
+
+.billing-stat--success {
+  --stat-color: #22c55e;
+}
+
+.billing-stat--danger {
+  --stat-color: #ef4444;
+}
+
+.billing-stat__label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #96A0B7);
+  margin-bottom: 0.25rem;
+}
+
+.billing-stat__value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  color: var(--text, #F5F7FB);
+  line-height: 1.3;
+}
+
+.billing-stat__sub {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-faint, #5C6580);
+  margin-top: 0.3rem;
+}
+
+/* ─── Loading state ────────────────────────────────────── */
+.billing-widget--loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.billing-widget__spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--border-strong, rgba(255,255,255,0.18));
+  border-top-color: var(--amber, #FFB020);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Error state ──────────────────────────────────────── */
+.billing-widget--error {
+  padding: 1.5rem;
+  text-align: center;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+  border-radius: 10px;
+}
+
+.billing-widget__detail {
+  font-size: 0.8rem;
+  color: #f87171;
+  margin-top: 0.25rem;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .billing-widget__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .billing-widget__stats {
+    grid-template-columns: 1fr;
+  }
+}

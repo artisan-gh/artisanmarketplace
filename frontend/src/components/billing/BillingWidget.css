@@ -1,0 +1,367 @@
+/* ==========================================================================
+   BillingWidget.css
+   Shares the "ledger" design language with InvoiceList/Form/Detail.css.
+   ========================================================================== */
+
+.billing-widget {
+  --ink: #14213d;
+  --canvas: #f7f8fb;
+  --surface: #ffffff;
+  --border: #e3e6ee;
+  --border-strong: #d3d7e3;
+  --muted: #6b7280;
+  --muted-soft: #9aa1af;
+  --accent: #12786a;
+  --accent-strong: #0d5c51;
+  --accent-soft: #e6f3f1;
+  --success: #0f8f5f;
+  --success-soft: #e8f8f0;
+  --warning: #b5750f;
+  --warning-soft: #fbf1e0;
+  --danger: #c02b2b;
+  --danger-soft: #fdeeee;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(20, 33, 61, 0.06);
+  --shadow-md: 0 8px 24px rgba(20, 33, 61, 0.06);
+
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--canvas);
+  padding: 24px;
+  border-radius: var(--radius-md);
+}
+
+/* ---------- Header ---------- */
+
+.billing-widget__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.billing-widget__title {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.billing-widget__subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 2px 0 0;
+}
+
+.billing-widget__updated {
+  font-size: 12px;
+  color: var(--muted-soft);
+  white-space: nowrap;
+}
+
+/* ---------- KPI row ---------- */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 18px 20px;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--kpi-accent, var(--accent));
+}
+
+.kpi-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+.kpi-card__value {
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.kpi-card__meta {
+  font-size: 12px;
+  color: var(--muted-soft);
+  margin: 6px 0 0;
+}
+
+.kpi-card--revenue { --kpi-accent: var(--accent); }
+.kpi-card--overdue { --kpi-accent: var(--danger); }
+.kpi-card--pending { --kpi-accent: var(--warning); }
+.kpi-card--success { --kpi-accent: var(--success); }
+
+/* ---------- Skeleton loading ---------- */
+
+.kpi-skeleton {
+  height: 96px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--border) 25%, #eef0f5 37%, var(--border) 63%);
+  background-size: 400% 100%;
+  animation: kpi-shimmer 1.4s ease infinite;
+}
+
+@keyframes kpi-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi-skeleton {
+    animation: none;
+  }
+}
+
+/* ---------- Content grid ---------- */
+
+.billing-widget__grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 22px;
+}
+
+.panel--span-2 {
+  grid-column: 1 / -1;
+}
+
+.panel__title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
+/* ---------- Status breakdown ---------- */
+
+.status-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-breakdown__row {
+  display: grid;
+  grid-template-columns: 84px 1fr 40px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.status-breakdown__label {
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+.status-breakdown__track {
+  height: 8px;
+  background: var(--canvas);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.status-breakdown__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--bar-color, var(--accent));
+  transition: width 0.3s ease;
+}
+
+.status-breakdown__count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* ---------- Lists (overdue invoices / recent payments) ---------- */
+
+.dashboard-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.list-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.list-row:first-child {
+  padding-top: 0;
+}
+
+.list-row__primary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.list-row__title {
+  color: var(--ink);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-row__subtitle {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.list-row__value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.list-row__value--danger {
+  color: var(--danger);
+}
+
+.list-row__tag {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  width: fit-content;
+}
+
+.empty-state {
+  color: var(--muted-soft);
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 960px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .billing-widget__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .billing-widget__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ─── Payment status badge ────────────────────────────────── */
+.payment-status-badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #1803bd;
+  letter-spacing: 0.03em;
+  margin-left: 0.5rem;
+}
+
+.list-row__primary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+/* ─── Ensure existing list-row styles are applied ────────── */
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.list-row:last-child {
+  border-bottom: none;
+}
+.list-row__title {
+  font-weight: 500;
+  color: #0180ff;
+}
+.list-row__subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+.list-row__value {
+  font-weight: 600;
+  color: #0482ff;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.list-row__value--danger {
+  color: #f87171;
+}
+.list-row__tag {
+  font-size: 0.65rem;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  padding: 0.1rem 0.5rem;
+  border-radius: 12px;
+  margin-left: 0.4rem;
+}

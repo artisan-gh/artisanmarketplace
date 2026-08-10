@@ -1,0 +1,112 @@
+/* ── Call Center Dashboard ── */
+.call-center-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: #f8fafc;
+}
+
+.call-center-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.call-center-header {
+  margin-bottom: 2rem;
+}
+
+.call-center-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.call-center-header p {
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.loading-spinner {
+  text-align: center;
+  color: #94a3b8;
+  padding: 3rem 0;
+}
+
+/* ── Stats Grid ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border-left: 4px solid #2563eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ── Quick Actions ── */
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.quick-action-card {
+  background: white;
+  padding: 1.25rem 1.75rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+  border: 1px solid #e2e8f0;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: #2563eb;
+}
+
+/* ── Access Denied ── */
+.access-denied {
+  text-align: center;
+  padding: 4rem 0;
+  color: #64748b;
+}
+
+.access-denied h2 {
+  color: #dc2626;
+  margin-bottom: 0.5rem;
+}

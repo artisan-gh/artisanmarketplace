@@ -1,0 +1,138 @@
+[
+  {
+    "model": "app_settings.appsetting",
+    "pk": 1,
+    "fields": {
+      "key": "site_name",
+      "value": "Artisan Marketplace",
+      "data_type": "STRING",
+      "group": "GENERAL",
+      "description": "The name of the platform",
+      "is_public": true,
+      "is_editable": true,
+      "is_required": true,
+      "options": {},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "app_settings.appsetting",
+    "pk": 2,
+    "fields": {
+      "key": "site_tagline",
+      "value": "Connect with trusted professionals",
+      "data_type": "STRING",
+      "group": "GENERAL",
+      "description": "Tagline displayed on the homepage",
+      "is_public": true,
+      "is_editable": true,
+      "is_required": false,
+      "options": {},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "app_settings.appsetting",
+    "pk": 3,
+    "fields": {
+      "key": "currency",
+      "value": "GHS",
+      "data_type": "STRING",
+      "group": "PAYMENT",
+      "description": "Default currency",
+      "is_public": true,
+      "is_editable": true,
+      "is_required": true,
+      "options": {},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "app_settings.appsetting",
+    "pk": 4,
+    "fields": {
+      "key": "tax_rate",
+      "value": "7.5",
+      "data_type": "FLOAT",
+      "group": "PAYMENT",
+      "description": "Default tax rate percentage",
+      "is_public": false,
+      "is_editable": true,
+      "is_required": false,
+      "options": {},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "app_settings.appsetting",
+    "pk": 5,
+    "fields": {
+      "key": "email_from",
+      "value": "noreply@artisanmarketplace.com",
+      "data_type": "EMAIL",
+      "group": "EMAIL",
+      "description": "Sender email address for system emails",
+      "is_public": false,
+      "is_editable": true,
+      "is_required": true,
+      "options": {},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "app_settings.appsetting",
+    "pk": 6,
+    "fields": {
+      "key": "support_email",
+      "value": "support@artisanmarketplace.com",
+      "data_type": "EMAIL",
+      "group": "EMAIL",
+      "description": "Support email address",
+      "is_public": true,
+      "is_editable": true,
+      "is_required": false,
+      "options": {},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "app_settings.appsetting",
+    "pk": 7,
+    "fields": {
+      "key": "max_upload_size_mb",
+      "value": "10",
+      "data_type": "INTEGER",
+      "group": "SECURITY",
+      "description": "Maximum file upload size in MB",
+      "is_public": false,
+      "is_editable": true,
+      "is_required": false,
+      "options": {"min": 1, "max": 100},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "app_settings.appsetting",
+    "pk": 8,
+    "fields": {
+      "key": "enable_payments",
+      "value": "true",
+      "data_type": "BOOLEAN",
+      "group": "FEATURES",
+      "description": "Enable payment processing",
+      "is_public": false,
+      "is_editable": true,
+      "is_required": true,
+      "options": {},
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  }
+]

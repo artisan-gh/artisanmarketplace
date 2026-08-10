@@ -1,0 +1,474 @@
+/* IncidentForm.css – Modern, clean, responsive */
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --success: #16a34a;
+  --success-hover: #15803d;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ─── Container with glowing border ────────────────────────── */
+.incident-form-container {
+  background: white;
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-width: 900px;
+  margin: 2rem auto;
+  border: 1px solid rgba(79, 70, 229, 0.25);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 25px rgba(79, 70, 229, 0.15); /* glow */
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.incident-form-container:hover {
+  box-shadow:
+    var(--shadow-lg),
+    0 0 40px rgba(79, 70, 229, 0.25); /* intensified glow on hover */
+  border-color: rgba(79, 70, 229, 0.5);
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+.incident-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.incident-form-header__spacer {
+  flex: 1;
+}
+
+.incident-form-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.incident-form-header__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+}
+
+.incident-form-header__actions {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ─── Form ──────────────────────────────────────────────────── */
+.incident-form {
+  padding: 2rem;
+}
+
+/* ─── Field Groups ─────────────────────────────────────────── */
+.field-group {
+  margin-bottom: 1.5rem;
+}
+
+.field-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+  color: var(--gray-700);
+  font-size: 0.9rem;
+}
+
+.required-star {
+  color: var(--danger);
+  margin-left: 2px;
+}
+
+/* Inputs, selects, textareas */
+.field-group input,
+.field-group select,
+.field-group textarea {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background: white;
+  color: var(--gray-900);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.field-group select option {
+  color: var(--gray-900);
+  background: white;
+}
+
+.field-group input::placeholder,
+.field-group textarea::placeholder {
+  color: var(--gray-400);
+}
+
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.field-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.field-group select:disabled {
+  background: var(--gray-100);
+  cursor: not-allowed;
+  color: var(--gray-500);
+}
+
+/* Error state */
+.input-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.error-text {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--danger);
+}
+
+.text-xs {
+  font-size: 0.8rem;
+}
+.text-gray-400 {
+  color: var(--gray-400);
+}
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+/* ─── Grid Layout ──────────────────────────────────────────── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Customer Selection ───────────────────────────────────── */
+.customer-selected {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: var(--gray-100);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  margin: 0.5rem 0;
+}
+
+.customer-name {
+  font-weight: 500;
+}
+.customer-phone {
+  color: var(--gray-500);
+  font-size: 0.8rem;
+}
+
+.new-customer-toggle {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 500;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+.new-customer-toggle:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* ─── New Customer Form ────────────────────────────────────── */
+.new-customer-form {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 0.5rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+.new-customer-form h4 {
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Buttons ──────────────────────────────────────────────── */
+.btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--gray-200);
+  color: var(--gray-700);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--gray-300);
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+.btn-success:hover:not(:disabled) {
+  background: var(--success-hover);
+}
+
+/* ─── Spinner ──────────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Error Banner ─────────────────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.error-banner svg {
+  flex-shrink: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* ─── Responsive tweaks ───────────────────────────────────── */
+@media (max-width: 640px) {
+  .incident-form-header {
+    flex-wrap: wrap;
+    padding: 1rem 1.5rem;
+  }
+  .incident-form-header__title {
+    font-size: 1.25rem;
+  }
+  .incident-form {
+    padding: 1.5rem;
+  }
+  .btn-group {
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+  .btn-group .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* Force dark text on all form inputs – overrides any global white text */
+.field-group input,
+.field-group select,
+.field-group textarea {
+  color: #111827 !important; /* dark gray */
+  background: #ffffff !important; /* white background */
+}
+
+/* Ensure placeholder text is visible (light gray) */
+.field-group input::placeholder,
+.field-group textarea::placeholder {
+  color: #9ca3af !important; /* gray-400 */
+}
+
+/* ─── Force button colors ──────────────────────────────────── */
+.btn {
+  color: inherit; /* reset any global white text */
+}
+
+.btn-primary {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+}
+
+.btn-secondary {
+  background: #e5e7eb !important;
+  color: #374151 !important;
+}
+
+.btn-success {
+  background: #16a34a !important;
+  color: #ffffff !important;
+}
+
+/* Also force input/select/textarea colors (if not already) */
+.field-group input,
+.field-group select,
+.field-group textarea {
+  color: #111827 !important;
+  background: #ffffff !important;
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+.incident-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 2rem;
+  background: var(--gray-50, #f9fafb);
+  border-bottom: 1px solid var(--gray-200, #e5e7eb);
+}
+
+.incident-form-header__title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.incident-form-header__title-group h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--gray-800, #1f2937);
+  margin: 0;
+}
+
+.incident-form-header__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--primary, #4f46e5);
+  color: white;
+}
+
+.incident-form-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ─── Logout Button ─────────────────────────────────────────── */
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--gray-300, #d1d5db);
+  border-radius: 6px;
+  color: var(--gray-700, #374151);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.btn-logout .btn-icon {
+  font-size: 1rem;
+}

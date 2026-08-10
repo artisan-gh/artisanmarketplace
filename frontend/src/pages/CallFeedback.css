@@ -1,0 +1,29 @@
+/* ── Call Feedback ── */
+.call-feedback-page {
+  padding: 2rem;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.feedback-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.feedback-item {
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 0.75rem;
+}
+
+.feedback-rating {
+  font-size: 1.2rem;
+  color: #f59e0b;
+}
+
+.feedback-comment {
+  color: #334155;
+  margin-top: 0.5rem;
+}

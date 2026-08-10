@@ -1,0 +1,62 @@
+/* ── Performance Page ── */
+.performance-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: #f8fafc;
+}
+
+.performance-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.performance-container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 2rem;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.perf-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.perf-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.perf-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.perf-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.perf-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 4rem 0;
+  color: #94a3b8;
+}

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice #{{ invoice.invoice_number }}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
+    .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+    .header { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; padding: 30px 20px; text-align: center; }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+    .header p { margin: 5px 0 0; opacity: 0.9; }
+    .content { padding: 30px 25px; }
+    .greeting { font-size: 18px; margin-bottom: 20px; }
+    .invoice-details { background: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0; border: 1px solid #e5e7eb; }
+    .invoice-details table { width: 100%; border-collapse: collapse; }
+    .invoice-details td { padding: 8px 0; }
+    .invoice-details .label { color: #6b7280; font-weight: 500; }
+    .invoice-details .value { text-align: right; font-weight: 600; }
+
+    .line-items { margin: 20px 0; }
+    .line-items table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .line-items th { text-align: left; padding: 8px 0; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-weight: 600; }
+    .line-items td { padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+    .line-items .text-right { text-align: right; }
+    .line-items .text-center { text-align: center; }
+
+    .materials-section { margin: 20px 0; padding-top: 10px; border-top: 1px solid #e5e7eb; }
+    .materials-section h4 { margin: 0 0 10px 0; color: #374151; font-size: 15px; }
+    .materials-section table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .materials-section th { text-align: left; padding: 8px 0; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-weight: 600; }
+    .materials-section td { padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+
+    .totals { margin-top: 20px; border-top: 2px solid #e5e7eb; padding-top: 10px; }
+    .totals-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; }
+    .totals-row.total { font-size: 20px; font-weight: 700; color: #7c3aed; border-top: 2px solid #e5e7eb; margin-top: 10px; padding-top: 10px; }
+    .totals-row.discount { color: #22c55e; }
+    .totals-row.materials { color: #3b82f6; }
+    .totals-row.transport { color: #8b5cf6; }
+
+    .btn-container { text-align: center; margin: 30px 0; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+    .footer { padding: 20px 25px; text-align: center; border-top: 1px solid #e5e7eb; font-size: 14px; color: #6b7280; }
+    .footer a { color: #7c3aed; text-decoration: none; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-paid { background: #d1fae5; color: #065f46; }
+    .badge-sent { background: #dbeafe; color: #1e40af; }
+    .badge-overdue { background: #fee2e2; color: #991b1b; }
+
+    .materials-note { background: #fef9c3; padding: 10px 14px; border-radius: 6px; border: 1px solid #facc15; margin: 15px 0; font-size: 14px; color: #78350f; }
+    .materials-note strong { color: #92400e; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Invoice #{{ invoice.invoice_number }}</h1>
+    <p>ArtisanHub – Workforce Management Platform</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="greeting">
+      Dear <strong>{{ customer.name }}</strong>,
+    </div>
+    <p>
+      Thank you for choosing ArtisanHub. Please find your invoice details below.
+      You can securely pay online using the link provided.
+    </p>
+
+    <!-- Invoice Summary -->
+    <div class="invoice-details">
+      <table>
+        <tr>
+          <td class="label">Invoice Date</td>
+          <td class="value">{{ invoice.issued_date|date:"F d, Y" }}</td>
+        </tr>
+        <tr>
+          <td class="label">Due Date</td>
+          <td class="value">{{ invoice.due_date|date:"F d, Y" }}</td>
+        </tr>
+        <tr>
+          <td class="label">Status</td>
+          <td class="value">
+            <span class="badge badge-{{ invoice.status|lower }}">
+              {{ invoice.get_status_display }}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ─── Line Items ───────────────────────────────────────── -->
+    {% if invoice.items.all %}
+      <div class="line-items">
+        <h3 style="margin: 0 0 12px; font-size: 16px; color: #1f2937;">Line Items</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="text-center">Qty</th>
+              <th class="text-right">Unit Price</th>
+              <th class="text-right">Tax %</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in invoice.items.all %}
+              <tr>
+                <td>{{ item.description }}</td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-right">₵{{ item.unit_price|floatformat:2 }}</td>
+                <td class="text-right">{{ item.tax_rate|floatformat:0 }}%</td>
+                <td class="text-right">₵{{ item.line_total|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+    <!-- ─── Materials (Purchased on behalf) ──────────────────── -->
+    {% if invoice.purchased_items.all %}
+      <div class="materials-section">
+        <h4>🛒 Materials &amp; Supplies Purchased</h4>
+        <p style="font-size: 13px; color: #6b7280; margin: 0 0 10px;">
+          Items bought on your behalf for this job, added to your invoice total.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="text-center">Qty</th>
+              <th class="text-right">Unit Cost</th>
+              <th class="text-right">Total Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mat in invoice.purchased_items.all %}
+              <tr>
+                <td>{{ mat.description }}</td>
+                <td class="text-center">{{ mat.quantity }}</td>
+                <td class="text-right">₵{{ mat.unit_cost|floatformat:2 }}</td>
+                <td class="text-right">₵{{ mat.total_cost|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="materials-note">
+          <strong>✓</strong> Materials subtotal: <strong>₵{{ invoice.materials_total|floatformat:2 }}</strong>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- ─── Totals ────────────────────────────────────────────── -->
+    <div class="totals">
+      <div class="totals-row">
+        <span>Subtotal</span>
+        <span>₵{{ invoice.subtotal|floatformat:2 }}</span>
+      </div>
+
+      {% if invoice.tax_amount > 0 %}
+        <div class="totals-row">
+          <span>Tax</span>
+          <span>₵{{ invoice.tax_amount|floatformat:2 }}</span>
+        </div>
+      {% endif %}
+
+      {% if invoice.discount_amount > 0 %}
+        <div class="totals-row discount">
+          <span>Discount</span>
+          <span>- ₵{{ invoice.discount_amount|floatformat:2 }}</span>
+        </div>
+      {% endif %}
+
+      {% if invoice.materials_total > 0 %}
+        <div class="totals-row materials">
+          <span>Materials &amp; supplies</span>
+          <span>₵{{ invoice.materials_total|floatformat:2 }}</span>
+        </div>
+      {% endif %}
+
+      <!-- ─── ✨ TRANSPORT COST ─────────────────────────────── -->
+      {% if invoice.transport_cost > 0 %}
+        <div class="totals-row transport">
+          <span>Transport / delivery</span>
+          <span>₵{{ invoice.transport_cost|floatformat:2 }}</span>
+        </div>
+      {% endif %}
+
+      <div class="totals-row total">
+        <span>Total Due</span>
+        <span>₵{{ invoice.grand_total|floatformat:2 }}</span>
+      </div>
+    </div>
+
+    <!-- ─── Pay Now Button ────────────────────────────────────── -->
+    {% if payment_link %}
+      <div class="btn-container">
+        <a href="{{ payment_link }}" class="btn">Pay Now</a>
+      </div>
+    {% else %}
+      <p style="color: #dc2626;">Payment link could not be generated. Please contact support.</p>
+    {% endif %}
+
+    <p style="font-size: 14px; color: #6b7280;">
+      This link will take you to our secure payment partner. If you have any issues,
+      please contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>&copy; 2026 ArtisanHub. All rights reserved.</p>
+    <p>
+      <a href="{{ site_url }}">{{ site_url }}</a> &bull;
+      <a href="#">Privacy Policy</a> &bull;
+      <a href="#">Terms of Service</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>
