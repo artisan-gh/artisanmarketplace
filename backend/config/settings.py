@@ -275,11 +275,15 @@ LOGIN_URL = "/login/"
 # CORS (development / production)
 # ------------------------------------------------------------------------------
 
+CORS_ALLOWED_ORIGINS = [
+    "https://frontendapi-q90c.onrender.com",
+    "http://localhost:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
-CORS_ALLOW_CREDENTIALS = True
 
 # ------------------------------------------------------------------------------
 # REST FRAMEWORK
