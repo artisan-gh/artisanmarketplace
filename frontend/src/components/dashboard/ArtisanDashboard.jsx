@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getArtisanDashboard } from '../../api/dashboardAPI';
 import { acceptAssignment } from '../../api/assignmentsAPI';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useAuth } from '../../context/AuthContext';
 import './Artisandashboard.css';
 
@@ -134,6 +135,12 @@ const StatCard = ({ icon: Icon, color, value, label }) => (
 
 export const ArtisanDashboard = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
   const queryClient = useQueryClient();
 
   // ─── Main Dashboard Data ──────────────────────────────────
@@ -238,7 +245,7 @@ export const ArtisanDashboard = () => {
           </div>
         </div>
         <h1 className="artisan-dashboard__title">Artisan Dashboard</h1>
-        <button type="button" onClick={logout} className="logout-btn">
+        <button type="button" onClick={handleLogout} className="logout-btn">
           <IconLogout className="logout-btn__icon" />
           Log out
         </button>

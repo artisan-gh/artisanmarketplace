@@ -50,8 +50,10 @@ export const AuthProvider = ({ children }) => {
 
     setUser(null);
 
-    // Redirect to login
-    window.location.href = "/login";
+    // IMPORTANT:
+    // Do not use window.location.href = "/login" here.
+    // The component that calls logout() should navigate
+    // using React Router.
   }, []);
 
   // ==========================================================
@@ -180,7 +182,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Backend may return:
-        // { email: [...], password: [...] }
+        // { email: [...] }
         if (responseData.email) {
           throw {
             detail: Array.isArray(responseData.email)
@@ -189,6 +191,8 @@ export const AuthProvider = ({ children }) => {
           };
         }
 
+        // Backend may return:
+        // { password: [...] }
         if (responseData.password) {
           throw {
             detail: Array.isArray(responseData.password)
@@ -308,7 +312,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       throw {
-        message: "Registration failed. Please try again.",
+        message:
+          "Registration failed. Please try again.",
       };
     }
   };
@@ -397,4 +402,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+
 

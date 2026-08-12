@@ -1,6 +1,6 @@
 // src/components/dashboard/AdminDashboard.jsx
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom'; // <-- added for navigation
+
 import { getDashboardSummary } from '../../api/dashboardAPI';
 import { getBreachedSLAs, getAtRiskSLAs } from '../../api/slaAPI';
 import { BillingWidget } from '../billing/BillingWidget';
@@ -23,7 +23,8 @@ import './Admindashboard.css';
 // ─── Real API functions ──────────────────────────────────────
 import { getArtisans } from '../../api/artisansAPI';
 import { getCustomers } from '../../api/customersAPI';
-import { logout } from '../../api/authAPI';
+import { useAuth } from "../../context/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 
 // ─── Icons ──────────────────────────────────────────────────
 import { FaFileInvoice, FaPlusCircle } from 'react-icons/fa'; // <-- added
@@ -183,10 +184,13 @@ const RatePanel = ({ label, percent, subtitle }) => {
 };
 
 export const AdminDashboard = () => {
-  // ─── Use authAPI logout directly ──────────────────────────
-  const handleLogout = async () => {
-    await logout();
-    window.location.href = '/login';
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  // ─── Handle logout ────────────────────────────────────────
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
   // ─── Main Dashboard Data ──────────────────────────────────

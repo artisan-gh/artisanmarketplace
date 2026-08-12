@@ -1,6 +1,7 @@
 // src/components/dashboard/AgentDashboard.jsx
 import { useQuery } from '@tanstack/react-query';
 import { getAgentDashboard } from '../../api/dashboardAPI';
+import { useNavigate } from "react-router-dom";
 import { useAuth } from '../../context/AuthContext';
 import './Agentdashboard.css';
 
@@ -92,6 +93,12 @@ const StatCard = ({ icon: Icon, color, value, label }) => (
 
 export const AgentDashboard = () => {
   const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+      logout();
+      navigate("/login", { replace: true });
+    };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['agentDashboard'],
@@ -159,7 +166,7 @@ export const AgentDashboard = () => {
           </div>
         </div>
         <h1 className="agent-dashboard__title">Agent Dashboard – Incidents</h1>
-        <button type="button" onClick={logout} className="logout-btn">
+        <button type="button" onClick={handleLogout} className="logout-btn">
           <IconLogout className="logout-btn__icon" />
           Log out
         </button>

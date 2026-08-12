@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { motion } from 'framer-motion';
 import {
   FaHammer, FaUser, FaBuilding, FaUserCircle, FaSignOutAlt,
@@ -35,6 +36,12 @@ const ROLE_CARDS = {
 
 export default function Dashboard() {
   const { user, logout, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
   const [walletBalance, setWalletBalance] = useState(null);
   const [walletLoading, setWalletLoading] = useState(true);
 
@@ -127,7 +134,7 @@ export default function Dashboard() {
             <FaUserCircle aria-hidden="true" />
             Profile
           </Link>
-          <button onClick={logout} className="dash-logout-btn">
+          <button onClick={handleLogout} className="dash-logout-btn">
             <FaSignOutAlt aria-hidden="true" />
             Logout
           </button>

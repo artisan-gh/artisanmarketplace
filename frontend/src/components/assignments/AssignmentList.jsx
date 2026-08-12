@@ -6,6 +6,7 @@ import { getAssignments } from '../../api/assignmentsAPI';
 import { DataTable } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
 import { SearchBar } from '../common/SearchBar';
+
 import { useAuth } from '../../context/AuthContext';
 import './AssignmentList.css';
 
@@ -46,8 +47,14 @@ const STATUS_OPTIONS = [
 ];
 
 export const AssignmentList = () => {
+  
+  const { logout } = useAuth();
   const navigate = useNavigate();
-  const { logout } = useAuth();  // <-- get logout function
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };  // <-- get logout function
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [search, setSearch] = useState('');
@@ -146,7 +153,7 @@ export const AssignmentList = () => {
         </div>
         <button
           type="button"
-          onClick={logout}
+          onClick={handleLogout}
           className="logout-btn"
         >
           <IconLogout className="logout-btn__icon" />
