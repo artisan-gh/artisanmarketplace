@@ -3,7 +3,7 @@ import uuid
 
 class IncidentCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.CharField(max_length=20, unique=True, blank=True, help_text="Auto-generated code like CAT-001")
+    code = models.CharField(max_length=100, unique=True, blank=True, help_text="Auto-generated code like CAT-001")
     name = models.CharField(max_length=100, unique=True, db_index=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
@@ -35,7 +35,7 @@ class IncidentCategory(models.Model):
 
 class SubCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.CharField(max_length=20, unique=True, blank=True, help_text="Auto-generated code like SUB-001")
+    code = models.CharField(max_length=100, unique=True, blank=True, help_text="Auto-generated code like SUB-001")
     category = models.ForeignKey(
         IncidentCategory,
         on_delete=models.CASCADE,
