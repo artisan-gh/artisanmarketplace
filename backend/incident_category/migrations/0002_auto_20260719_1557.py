@@ -287,17 +287,50 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # ---------------------------------------------------------------------
+        # IMPORTANT: The initial migration (0001) created name and code fields
+        # with max_length=20. We must widen them to 100 BEFORE seeding.
+        # ---------------------------------------------------------------------
 
-        # IMPORTANT:
-        # 0001 created the name field with max_length=20.
-        # Increase it to 100 BEFORE inserting the seed data.
+        # 1. Widen IncidentCategory.name
         migrations.AlterField(
             model_name='incidentcategory',
+            name='name',
+            field=models.CharField(max_length=100, unique=True, db_index=True),
+        ),
+
+        # 2. Widen IncidentCategory.code
+        migrations.AlterField(
+            model_name='incidentcategory',
+            name='code',
+            field=models.CharField(
+                max_length=100,
+                unique=True,
+                blank=True,
+                help_text='Auto-generated code like CAT-001'
+            ),
+        ),
+
+        # 3. Widen SubCategory.name
+        migrations.AlterField(
+            model_name='subcategory',
             name='name',
             field=models.CharField(max_length=100),
         ),
 
-        # Now seed the categories.
+        # 4. Widen SubCategory.code
+        migrations.AlterField(
+            model_name='subcategory',
+            name='code',
+            field=models.CharField(
+                max_length=100,
+                unique=True,
+                blank=True,
+                help_text='Auto-generated code like SUB-001'
+            ),
+        ),
+
+        # Now run the seed – all fields can now hold long strings.
         migrations.RunPython(
             seed_categories,
             reverse_seed,
