@@ -365,30 +365,32 @@ export const LandingPage = () => {
                 <a href="#" aria-label="YouTube"><FaYoutube /></a>
               </div>
             </div>
+
             <div className="footer__links">
               <h4>Product</h4>
               <a href="#features">Features</a>
               <a href="#testimonials">Testimonials</a>
-              <a href="/pricing">Pricing</a>
-              <a href="/demo">Demo</a>
+              <Link to="/pricing">Pricing</Link>
+              <Link to="/demo">Demo</Link>
             </div>
+
             <div className="footer__links">
               <h4>Company</h4>
-              <a href="/about">About</a>
-              <a href="/careers">Careers</a>
-              <a href="/blog">Blog</a>
-              <a href="/contact">Contact</a>
+              <Link to="/about">About</Link>
+              <Link to="/careers">Careers</Link>
+              <Link to="/blog">Blog</Link>
+              <Link to="/contact">Contact</Link>
             </div>
+
             <div className="footer__links">
               <h4>Support</h4>
-              <a href="/help">Help Center</a>
-              <a href="/privacy">Privacy Policy</a>
-              <a href="/terms">Terms of Service</a>
-              <Link to="/terms/artisan-agreement">
-                Artisan Agreement
-              </Link>
+              <Link to="/help">Help Center</Link>
+              <Link to="/privacy">Privacy Policy</Link>
+              <Link to="/terms">Terms of Service</Link>
+              <Link to="/terms/artisan-agreement">Artisan Agreement</Link>
             </div>
           </div>
+
           <div className="footer__bottom">
             <span>&copy; 2026 ArtisanHub. All rights reserved.</span>
             <span>Made with ❤️ in Ghana</span>

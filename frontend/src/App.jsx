@@ -67,6 +67,14 @@ import { PublicInvoicePage } from './pages/PublicInvoicePage';
 import { MyAssignments } from './components/assignments/MyAssignments';
 
 import { ArtisanAgreementPage } from './pages/ArtisanAgreementPage';
+
+import { About } from './pages/About';
+import { Careers } from './pages/Careers';
+import { Blog } from './pages/Blog';
+import { Contact } from './pages/Contact';
+import { HelpCenter } from './pages/HelpCenter';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsOfService } from './pages/TermsOfService';
 function App() {
   return (
     <AuthProvider>
@@ -74,6 +82,13 @@ function App() {
         <Routes>
           {/* ─── Public Routes ────────────────────────────────── */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           <Route path="/terms/artisan-agreement" element={<ArtisanAgreementPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
