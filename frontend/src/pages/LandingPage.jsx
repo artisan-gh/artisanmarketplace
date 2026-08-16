@@ -384,6 +384,7 @@ export const LandingPage = () => {
               <a href="/help">Help Center</a>
               <a href="/privacy">Privacy Policy</a>
               <a href="/terms">Terms of Service</a>
+              <a href="/terms/artisan-agreement">Artisan Agreement</a>  {/* ✅ New link */}
             </div>
           </div>
           <div className="footer__bottom">

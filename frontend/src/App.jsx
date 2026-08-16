@@ -65,6 +65,8 @@ import { LandingPage } from './pages/LandingPage';
 import { PublicInvoicePage } from './pages/PublicInvoicePage';
 
 import { MyAssignments } from './components/assignments/MyAssignments';
+
+import { ArtisanAgreementPage } from './pages/ArtisanAgreementPage';
 function App() {
   return (
     <AuthProvider>
@@ -72,6 +74,7 @@ function App() {
         <Routes>
           {/* ─── Public Routes ────────────────────────────────── */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/terms/artisan-agreement" element={<ArtisanAgreementPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
