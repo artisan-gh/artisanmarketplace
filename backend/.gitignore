@@ -43,3 +43,8 @@ staticfiles/
 
 # Logs
 *.log
+
+# Installer-created backups (safe to regenerate from source)
+*.backup-*.py
+*.backup-*.jsx
+*.backup-*.css
