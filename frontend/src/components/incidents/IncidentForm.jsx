@@ -2,7 +2,18 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
-import { FaSignOutAlt } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  FaSignOutAlt,
+  FaExclamationTriangle,
+  FaUserPlus,
+  FaUserCheck,
+  FaTimes,
+  FaSave,
+  FaArrowLeft,
+  FaMapMarkerAlt,
+  FaClock,
+} from 'react-icons/fa';
 import {
   getIncidentCategories,
   getSubcategoriesByCategory,
@@ -19,14 +30,11 @@ export const IncidentForm = ({
   onCancel,
   isEditing = false,
   headerActions = null,
-  onLogout = null, // <-- new: optional logout handler
+  onLogout = null,
 }) => {
   // ─── Lazy initializer ──────────────────────────────────────
-  const getDefaultTargetResolution = () => {
-    return new Date(Date.now() + 24 * 60 * 60 * 1000)
-      .toISOString()
-      .slice(0, 16);
-  };
+  const getDefaultTargetResolution = () =>
+    new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16);
 
   const [formData, setFormData] = useState(() => ({
     customer: '',
@@ -109,9 +117,7 @@ export const IncidentForm = ({
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
     if (generalError) setGeneralError('');
   };
 
@@ -123,9 +129,7 @@ export const IncidentForm = ({
       address: customer.address || '',
     }));
     setShowNewCustomer(false);
-    if (errors.customer) {
-      setErrors((prev) => ({ ...prev, customer: '' }));
-    }
+    if (errors.customer) setErrors((prev) => ({ ...prev, customer: '' }));
   };
 
   const handleNewCustomerChange = (e) => {
@@ -240,315 +244,412 @@ export const IncidentForm = ({
 
   // ─── Render ──────────────────────────────────────────────
   return (
-    <div className="incident-form-container">
-      {/* ─── Header ────────────────────────────────────────── */}
-      <div className="incident-form-header">
-        <div className="incident-form-header__title-group">
-          <span className="incident-form-header__icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </span>
-          <h2>{isEditing ? 'Edit Incident' : 'New Incident'}</h2>
-        </div>
-
-        <div className="incident-form-header__actions">
-          {headerActions}
-          {onLogout && (
-            <button
-              type="button"
-              onClick={onLogout}
-              className="btn btn-logout"
-              aria-label="Logout"
-            >
-              <FaSignOutAlt className="btn-icon" />
-              <span>Logout</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="incident-form">
-        {/* ─── General Error ────────────────────────────────── */}
-        {generalError && (
-          <div className="error-banner">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span>{generalError}</span>
+    <div className="am-incident">
+      <motion.div
+        className="am-incident__card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {/* ─── Header ─────────────────────────────────────── */}
+        <header className="am-incident__header">
+          <div className="am-incident__title-group">
+            <div className="am-incident__icon">
+              <FaExclamationTriangle />
+            </div>
+            <div>
+              <span className="am-eyebrow">{isEditing ? 'Update' : 'Create'}</span>
+              <h2>{isEditing ? 'Edit Incident' : 'New Incident'}</h2>
+              <p>
+                {isEditing
+                  ? 'Update the details of this incident and save your changes.'
+                  : 'Log a new incident and assign a target resolution time.'}
+              </p>
+            </div>
           </div>
-        )}
 
-        {/* ─── Customer Section ────────────────────────────── */}
-        <div className="field-group">
-          <label>
-            Customer <span className="required-star">*</span>
-          </label>
-
-          {!showNewCustomer ? (
-            <>
-              <CustomerSearch
-                onSelect={handleCustomerSelect}
-                onNewCustomer={() => {
-                  setShowNewCustomer(true);
-                  setSelectedCustomer(null);
-                  setFormData((prev) => ({ ...prev, customer: '', address: '' }));
-                }}
-              />
-              {selectedCustomer && (
-                <div className="customer-selected">
-                  <span className="customer-name">{selectedCustomer.name}</span>
-                  <span className="customer-phone">{selectedCustomer.phone}</span>
-                </div>
-              )}
+          <div className="am-incident__header-actions">
+            {headerActions}
+            {onLogout && (
               <button
                 type="button"
-                onClick={toggleNewCustomer}
-                className="new-customer-toggle"
+                onClick={onLogout}
+                className="am-btn am-btn--danger"
+                aria-label="Logout"
               >
-                + Create new customer
+                <FaSignOutAlt />
+                <span>Logout</span>
               </button>
-            </>
-          ) : (
-            <div className="new-customer-form">
-              <h4>New Customer Details</h4>
-              <div className="grid-2">
-                <div className="field-group">
-                  <label>Full Name *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={newCustomer.name}
-                    onChange={handleNewCustomerChange}
-                    className={newCustomerErrors.name ? 'input-error' : ''}
-                  />
-                  {newCustomerErrors.name && (
-                    <span className="error-text">{newCustomerErrors.name}</span>
-                  )}
-                </div>
-                <div className="field-group">
-                  <label>Phone *</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={newCustomer.phone}
-                    onChange={handleNewCustomerChange}
-                    className={newCustomerErrors.phone ? 'input-error' : ''}
-                  />
-                  {newCustomerErrors.phone && (
-                    <span className="error-text">{newCustomerErrors.phone}</span>
-                  )}
-                </div>
-                <div className="field-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={newCustomer.email}
-                    onChange={handleNewCustomerChange}
-                    className={newCustomerErrors.email ? 'input-error' : ''}
-                  />
-                  {newCustomerErrors.email && (
-                    <span className="error-text">{newCustomerErrors.email}</span>
-                  )}
-                </div>
-                <div className="field-group">
-                  <label>Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={newCustomer.address}
-                    onChange={handleNewCustomerChange}
-                    className={newCustomerErrors.address ? 'input-error' : ''}
-                  />
-                  {newCustomerErrors.address && (
-                    <span className="error-text">{newCustomerErrors.address}</span>
-                  )}
-                </div>
-              </div>
-              <div className="btn-group" style={{ justifyContent: 'flex-end', borderTop: 'none', marginTop: '0.5rem' }}>
-                <button
-                  type="button"
-                  onClick={toggleNewCustomer}
-                  className="btn btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={createAndSelectCustomer}
-                  disabled={creatingCustomer}
-                  className="btn btn-success"
-                >
-                  {creatingCustomer ? 'Creating...' : 'Create & Select'}
-                </button>
+            )}
+          </div>
+        </header>
+
+        <form onSubmit={handleSubmit} className="am-incident__body" noValidate>
+          {/* ─── General Error ─────────────────────────── */}
+          <AnimatePresence>
+            {generalError && (
+              <motion.div
+                className="am-alert"
+                role="alert"
+                initial={{ opacity: 0, y: -8, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, y: -8, height: 0 }}
+              >
+                <FaExclamationTriangle />
+                <span>{generalError}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ─── Customer Section ──────────────────────── */}
+          <section className="am-section">
+            <div className="am-section__head">
+              <span className="am-section__step">1</span>
+              <div>
+                <h3>Customer</h3>
+                <p>Select an existing customer or create a new one.</p>
               </div>
             </div>
-          )}
-          {errors.customer && (
-            <span className="error-text">{errors.customer}</span>
-          )}
-        </div>
 
-        {/* ─── Title ────────────────────────────────────────── */}
-        <div className="field-group">
-          <label>
-            Title <span className="required-star">*</span>
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Brief summary of the issue"
-            className={errors.title ? 'input-error' : ''}
-          />
-          {errors.title && <span className="error-text">{errors.title}</span>}
-        </div>
+            <div className="am-field">
+              <label>
+                Customer <span className="am-required">*</span>
+              </label>
 
-        {/* ─── Description ──────────────────────────────────── */}
-        <div className="field-group">
-          <label>Description</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows="3"
-            placeholder="Detailed description of the issue..."
-          />
-        </div>
+              {!showNewCustomer ? (
+                <>
+                  <CustomerSearch
+                    onSelect={handleCustomerSelect}
+                    onNewCustomer={() => {
+                      setShowNewCustomer(true);
+                      setSelectedCustomer(null);
+                      setFormData((prev) => ({ ...prev, customer: '', address: '' }));
+                    }}
+                  />
 
-        {/* ─── Category & Subcategory ──────────────────────── */}
-        <div className="grid-2">
-          <div className="field-group">
-            <label>Category</label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="">Select category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
+                  <AnimatePresence>
+                    {selectedCustomer && (
+                      <motion.div
+                        className="am-customer-selected"
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                      >
+                        <div className="am-customer-selected__icon">
+                          <FaUserCheck />
+                        </div>
+                        <div>
+                          <strong>{selectedCustomer.name}</strong>
+                          <span>{selectedCustomer.phone}</span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <button
+                    type="button"
+                    onClick={toggleNewCustomer}
+                    className="am-btn am-btn--ghost am-btn--sm"
+                  >
+                    <FaUserPlus />
+                    Create new customer
+                  </button>
+                </>
+              ) : (
+                <motion.div
+                  className="am-new-customer"
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="am-new-customer__head">
+                    <h4>New customer details</h4>
+                    <button
+                      type="button"
+                      onClick={toggleNewCustomer}
+                      className="am-icon-btn"
+                      aria-label="Close"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+
+                  <div className="am-grid am-grid--2">
+                    <div className="am-field">
+                      <label>
+                        Full name <span className="am-required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={newCustomer.name}
+                        onChange={handleNewCustomerChange}
+                        placeholder="e.g. Kwame Mensah"
+                        className={newCustomerErrors.name ? 'has-error' : ''}
+                      />
+                      {newCustomerErrors.name && (
+                        <span className="am-error-text">{newCustomerErrors.name}</span>
+                      )}
+                    </div>
+
+                    <div className="am-field">
+                      <label>
+                        Phone <span className="am-required">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={newCustomer.phone}
+                        onChange={handleNewCustomerChange}
+                        placeholder="+233 000 000 000"
+                        className={newCustomerErrors.phone ? 'has-error' : ''}
+                      />
+                      {newCustomerErrors.phone && (
+                        <span className="am-error-text">{newCustomerErrors.phone}</span>
+                      )}
+                    </div>
+
+                    <div className="am-field">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={newCustomer.email}
+                        onChange={handleNewCustomerChange}
+                        placeholder="customer@example.com"
+                        className={newCustomerErrors.email ? 'has-error' : ''}
+                      />
+                      {newCustomerErrors.email && (
+                        <span className="am-error-text">{newCustomerErrors.email}</span>
+                      )}
+                    </div>
+
+                    <div className="am-field">
+                      <label>Address</label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={newCustomer.address}
+                        onChange={handleNewCustomerChange}
+                        placeholder="Street, city, region"
+                        className={newCustomerErrors.address ? 'has-error' : ''}
+                      />
+                      {newCustomerErrors.address && (
+                        <span className="am-error-text">{newCustomerErrors.address}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="am-new-customer__actions">
+                    <button
+                      type="button"
+                      onClick={toggleNewCustomer}
+                      className="am-btn am-btn--ghost am-btn--sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={createAndSelectCustomer}
+                      disabled={creatingCustomer}
+                      className="am-btn am-btn--success am-btn--sm"
+                    >
+                      {creatingCustomer ? (
+                        <>
+                          <span className="am-spinner am-spinner--sm am-spinner--dark" />
+                          Creating…
+                        </>
+                      ) : (
+                        <>
+                          <FaUserPlus />
+                          Create &amp; select
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {errors.customer && (
+                <span className="am-error-text">{errors.customer}</span>
+              )}
+            </div>
+          </section>
+
+          {/* ─── Incident Details ─────────────────────── */}
+          <section className="am-section">
+            <div className="am-section__head">
+              <span className="am-section__step">2</span>
+              <div>
+                <h3>Incident details</h3>
+                <p>Describe what happened and how urgent it is.</p>
+              </div>
+            </div>
+
+            <div className="am-field">
+              <label>
+                Title <span className="am-required">*</span>
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="Brief summary of the issue"
+                className={errors.title ? 'has-error' : ''}
+              />
+              {errors.title && <span className="am-error-text">{errors.title}</span>}
+            </div>
+
+            <div className="am-field">
+              <label>Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={4}
+                placeholder="Detailed description of the issue…"
+              />
+            </div>
+
+            <div className="am-grid am-grid--2">
+              <div className="am-field">
+                <label>Category</label>
+                <select name="category" value={formData.category} onChange={handleChange}>
+                  <option value="">Select category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="am-field">
+                <label>Subcategory</label>
+                <select
+                  name="subcategory"
+                  value={formData.subcategory}
+                  onChange={handleChange}
+                  disabled={!formData.category}
+                >
+                  <option value="">Select subcategory</option>
+                  {subcategories.map((sub) => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className={`am-grid ${isEditing ? 'am-grid--2' : ''}`}>
+              <div className="am-field">
+                <label>Priority</label>
+                <select name="priority" value={formData.priority} onChange={handleChange}>
+                  {priorities.map((pri) => (
+                    <option key={pri.id} value={pri.name}>
+                      {pri.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {isEditing && (
+                <div className="am-field">
+                  <label>Status</label>
+                  <select name="status" value={formData.status} onChange={handleChange}>
+                    <option value="">Select status</option>
+                    {statuses.map((stat) => (
+                      <option key={stat.id} value={stat.id}>
+                        {stat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* ─── Scheduling & Location ─────────────────── */}
+          <section className="am-section">
+            <div className="am-section__head">
+              <span className="am-section__step">3</span>
+              <div>
+                <h3>Target &amp; location</h3>
+                <p>When should this be resolved, and where is it happening?</p>
+              </div>
+            </div>
+
+            <div className="am-field">
+              <label>
+                Target resolution <span className="am-required">*</span>
+              </label>
+              <div className={`am-input has-icon ${errors.target_resolution ? 'has-error' : ''}`}>
+                <span className="am-input__icon">
+                  <FaClock />
+                </span>
+                <input
+                  type="datetime-local"
+                  name="target_resolution"
+                  value={formData.target_resolution}
+                  onChange={handleChange}
+                />
+              </div>
+              {errors.target_resolution && (
+                <span className="am-error-text">{errors.target_resolution}</span>
+              )}
+              <p className="am-help">Expected time by which this incident should be resolved.</p>
+            </div>
+
+            <div className="am-field">
+              <label>Location</label>
+              <div className="am-input has-icon">
+                <span className="am-input__icon">
+                  <FaMapMarkerAlt />
+                </span>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Address or GPS coordinates"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* ─── Actions ──────────────────────────────── */}
+          <div className="am-incident__actions">
+            <button type="button" onClick={onCancel} className="am-btn am-btn--ghost">
+              <FaArrowLeft />
+              Back to list
+            </button>
+
+            <div className="am-incident__actions-right">
+              <button type="button" onClick={onCancel} className="am-btn am-btn--ghost">
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading || creatingCustomer}
+                className="am-btn am-btn--primary am-btn--cta"
+              >
+                {loading ? (
+                  <>
+                    <span className="am-spinner am-spinner--sm" />
+                    Saving…
+                  </>
+                ) : (
+                  <>
+                    <FaSave />
+                    {isEditing ? 'Update incident' : 'Create incident'}
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-          <div className="field-group">
-            <label>Subcategory</label>
-            <select
-              name="subcategory"
-              value={formData.subcategory}
-              onChange={handleChange}
-              disabled={!formData.category}
-            >
-              <option value="">Select subcategory</option>
-              {subcategories.map((sub) => (
-                <option key={sub.id} value={sub.id}>{sub.name}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* ─── Priority ─────────────────────────────────────── */}
-        <div className="field-group">
-          <label>Priority</label>
-          <select
-            name="priority"
-            value={formData.priority}
-            onChange={handleChange}
-          >
-            {priorities.map((pri) => (
-              <option key={pri.id} value={pri.name}>{pri.name}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* ─── Status (only when editing) ───────────────────── */}
-        {isEditing && (
-          <div className="field-group">
-            <label>Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <option value="">Select status</option>
-              {statuses.map((stat) => (
-                <option key={stat.id} value={stat.id}>{stat.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* ─── Target Resolution ───────────────────────────── */}
-        <div className="field-group">
-          <label>
-            Target Resolution <span className="required-star">*</span>
-          </label>
-          <input
-            type="datetime-local"
-            name="target_resolution"
-            value={formData.target_resolution}
-            onChange={handleChange}
-            className={errors.target_resolution ? 'input-error' : ''}
-          />
-          {errors.target_resolution && (
-            <span className="error-text">{errors.target_resolution}</span>
-          )}
-          <p className="text-xs text-gray-400 mt-1">
-            Expected time by which this incident should be resolved.
-          </p>
-        </div>
-
-        {/* ─── Location ─────────────────────────────────────── */}
-        <div className="field-group">
-          <label>Location</label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            placeholder="Address or GPS coordinates"
-          />
-        </div>
-
-        {/* ─── Buttons ──────────────────────────────────────── */}
-        <div className="btn-group">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="btn btn-secondary"
-          >
-            Incident List
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="btn btn-secondary"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading || creatingCustomer}
-            className="btn btn-primary"
-          >
-            {loading ? (
-              <>
-                <span className="spinner" />
-                Saving...
-              </>
-            ) : (
-              isEditing ? 'Update Incident' : 'Create Incident'
-            )}
-          </button>
-        </div>
-      </form>
+        </form>
+      </motion.div>
     </div>
   );
 };
@@ -559,5 +660,5 @@ IncidentForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   isEditing: PropTypes.bool,
   headerActions: PropTypes.node,
-  onLogout: PropTypes.func, // <-- new
+  onLogout: PropTypes.func,
 };

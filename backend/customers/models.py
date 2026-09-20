@@ -47,7 +47,8 @@ class Customer(BaseModel):
     Customer model – individuals or companies who call in with issues.
     """
     name = models.CharField(max_length=255, db_index=True)
-    phone = models.CharField(max_length=20, db_index=True)
+    phone = models.CharField(max_length=20, unique=True,
+        db_index=True)
     email = models.EmailField(blank=True, db_index=True)
     address = models.TextField(blank=True)
     gps_lat = models.DecimalField(
@@ -65,6 +66,14 @@ class Customer(BaseModel):
         blank=True,
         related_name='customers',
         help_text="If this customer belongs to a company/organization"
+    )
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='customer',
+        help_text="Linked app account. Null for call-center-only customers.",
     )
     notes = models.TextField(blank=True, help_text="Internal notes about this customer")
     tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated tags")

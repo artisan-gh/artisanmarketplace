@@ -1,74 +1,51 @@
 // src/components/dashboard/AdminDashboard.jsx
 import { useQuery } from '@tanstack/react-query';
-
 import { getDashboardSummary } from '../../api/dashboardAPI';
 import { getBreachedSLAs, getAtRiskSLAs } from '../../api/slaAPI';
 import { BillingWidget } from '../billing/BillingWidget';
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
 import './Admindashboard.css';
 
-// ─── Real API functions ──────────────────────────────────────
 import { getArtisans } from '../../api/artisansAPI';
 import { getCustomers } from '../../api/customersAPI';
-import { useAuth } from "../../context/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaFileInvoice, FaPlusCircle } from 'react-icons/fa';
 
-// ─── Icons ──────────────────────────────────────────────────
-import { FaFileInvoice, FaPlusCircle } from 'react-icons/fa'; // <-- added
+const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-const COLORS = ['#3b82f6', '#22c55e', '#eab308', '#ef4444', '#8b5cf6'];
-
-// ─── Priority label mapping ──────────────────────────────────
 const PRIORITY_NAMES = {
-  1: 'Low',
-  2: 'Medium',
-  3: 'High',
-  4: 'Critical',
-  5: 'Urgent',
+  1: 'Low', 2: 'Medium', 3: 'High', 4: 'Critical', 5: 'Urgent',
 };
 
 const getPriorityLabel = (value) => {
   if (value === undefined || value === null) return 'Unknown';
-  if (typeof value === 'number') {
-    return PRIORITY_NAMES[value] || `Priority ${value}`;
-  }
-  if (typeof value === 'string') {
-    return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-  }
+  if (typeof value === 'number') return PRIORITY_NAMES[value] || `Priority ${value}`;
+  if (typeof value === 'string') return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
   return String(value);
 };
 
-// ─── Shared dark styling for Recharts ─────────────────────────
 const AXIS_TICK = { fill: '#94a3b8', fontSize: 12 };
-const AXIS_LINE = { stroke: 'rgba(255,255,255,0.09)' };
-const GRID_STROKE = 'rgba(255,255,255,0.06)';
+const AXIS_LINE = { stroke: 'rgba(148, 163, 184, 0.25)' };
+const GRID_STROKE = 'rgba(148, 163, 184, 0.15)';
 const TOOLTIP_STYLE = {
   contentStyle: {
-    background: '#131a2c',
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: '10px',
+    background: '#ffffff',
+    border: '1px solid #e6e9f2',
+    borderRadius: '12px',
     fontSize: '0.8rem',
-    color: '#f8fafc',
+    color: '#0f172a',
+    boxShadow: '0 12px 30px -10px rgba(15, 23, 42, 0.18)',
   },
-  labelStyle: { color: '#cbd5e1' },
-  itemStyle: { color: '#f8fafc' },
-  cursor: { fill: 'rgba(255,255,255,0.04)' },
+  labelStyle: { color: '#64748b', fontWeight: 600 },
+  itemStyle: { color: '#0f172a' },
+  cursor: { fill: 'rgba(99, 102, 241, 0.06)' },
 };
 
-// ─── Icons ──────────────────────────────────────────────────
+/* ─── Icons ──────────────────────────────────────────────── */
 const IconClipboard = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
     <rect x="6" y="4" width="12" height="17" rx="2" />
@@ -135,28 +112,28 @@ const IconUsers = (props) => (
   </svg>
 );
 
-// ─── Helpers ──────────────────────────────────────────────
+/* ─── Helpers ────────────────────────────────────────────── */
 const rateColor = (percent) => {
-  if (percent >= 70) return { color: '#22c55e', soft: 'rgba(34, 197, 94, 0.12)' };
-  if (percent >= 40) return { color: '#eab308', soft: 'rgba(234, 179, 8, 0.12)' };
+  if (percent >= 70) return { color: '#10b981', soft: 'rgba(16, 185, 129, 0.12)' };
+  if (percent >= 40) return { color: '#f59e0b', soft: 'rgba(245, 158, 11, 0.12)' };
   return { color: '#ef4444', soft: 'rgba(239, 68, 68, 0.12)' };
 };
 
 const StatCard = ({ icon: Icon, color, value, label, secondaryLabel, secondaryValue }) => (
-  <div className="stat-card">
-    <div className="stat-card__icon-wrap" style={{ '--stat-color': color }}>
-      <Icon className="stat-card__icon" />
+  <div className="am-stat" style={{ '--stat-color': color }}>
+    <div className="am-stat__top">
+      <div className="am-stat__icon">
+        <Icon />
+      </div>
     </div>
-    <div className="stat-card__body">
-      <div className="stat-card__value">{value}</div>
-      <div className="stat-card__label">{label}</div>
-      {secondaryLabel && (
-        <div className="stat-card__secondary">
-          <span className="stat-card__secondary-label">{secondaryLabel}</span>
-          <span className="stat-card__secondary-value">{secondaryValue}</span>
-        </div>
-      )}
-    </div>
+    <div className="am-stat__value">{value}</div>
+    <div className="am-stat__label">{label}</div>
+    {secondaryLabel && (
+      <div className="am-stat__secondary">
+        <span>{secondaryLabel}</span>
+        <strong>{secondaryValue}</strong>
+      </div>
+    )}
   </div>
 );
 
@@ -164,20 +141,23 @@ const RatePanel = ({ label, percent, subtitle }) => {
   const { color, soft } = rateColor(percent);
   const clamped = Math.min(100, Math.max(0, percent));
   return (
-    <div className="progress-panel">
-      <div className="progress-panel__top">
+    <div className="am-rate" style={{ '--rate-color': color, '--rate-soft': soft }}>
+      <div className="am-rate__head">
         <div>
-          <p className="progress-panel__label">{label}</p>
-          <p className="progress-panel__value">{percent}%</p>
-          <p className="progress-panel__subtitle">{subtitle}</p>
+          <p className="am-rate__label">{label}</p>
+          <p className="am-rate__value">
+            {percent}
+            <span>%</span>
+          </p>
+          <p className="am-rate__subtitle">{subtitle}</p>
         </div>
-        <div className="progress-panel__badge" style={{ '--rate-color': color, '--rate-soft': soft }}>
+        <div className="am-rate__badge">
           <IconGauge />
         </div>
       </div>
-      <div className="progress-panel__track">
-        <div className="progress-panel__fill" style={{ width: `${clamped}%`, '--rate-color': color }} />
-        <div className="progress-panel__dot" style={{ left: `${clamped}%`, '--rate-color': color }} />
+      <div className="am-rate__track">
+        <div className="am-rate__fill" style={{ width: `${clamped}%` }} />
+        <div className="am-rate__dot" style={{ left: `${clamped}%` }} />
       </div>
     </div>
   );
@@ -187,13 +167,11 @@ export const AdminDashboard = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  // ─── Handle logout ────────────────────────────────────────
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   };
 
-  // ─── Main Dashboard Data ──────────────────────────────────
   const {
     data: dashboardData,
     isLoading: dashboardLoading,
@@ -208,11 +186,7 @@ export const AdminDashboard = () => {
     retry: 1,
   });
 
-  // ─── SLA Data ──────────────────────────────────────────────
-  const {
-    data: breachesRaw,
-    error: breachesError,
-  } = useQuery({
+  const { data: breachesRaw, error: breachesError } = useQuery({
     queryKey: ['slaBreaches'],
     queryFn: async () => {
       const res = await getBreachedSLAs();
@@ -222,10 +196,7 @@ export const AdminDashboard = () => {
     retry: 1,
   });
 
-  const {
-    data: atRiskRaw,
-    error: atRiskError,
-  } = useQuery({
+  const { data: atRiskRaw, error: atRiskError } = useQuery({
     queryKey: ['slaAtRisk'],
     queryFn: async () => {
       const res = await getAtRiskSLAs();
@@ -235,7 +206,6 @@ export const AdminDashboard = () => {
     retry: 1,
   });
 
-  // ─── Real Artisans count ──────────────────────────────────
   const {
     data: artisansData,
     isLoading: artisansLoading,
@@ -250,7 +220,6 @@ export const AdminDashboard = () => {
     retry: 1,
   });
 
-  // ─── Real Customers count ──────────────────────────────────
   const {
     data: customersData,
     isLoading: customersLoading,
@@ -265,7 +234,6 @@ export const AdminDashboard = () => {
     retry: 1,
   });
 
-  // ─── Data extraction ──────────────────────────────────────
   const data = dashboardData || {};
   const summary = data.summary || {};
   const distribution = data.distribution || {};
@@ -277,19 +245,16 @@ export const AdminDashboard = () => {
   const breaches = Array.isArray(breachesRaw)
     ? breachesRaw
     : breachesRaw?.results || breachesRaw?.data || [];
-
   const atRisk = Array.isArray(atRiskRaw)
     ? atRiskRaw
     : atRiskRaw?.results || atRiskRaw?.data || [];
 
-  // ─── User counts (real) ────────────────────────────────────
   const artisans = Array.isArray(artisansData) ? artisansData : [];
   const customers = Array.isArray(customersData) ? customersData : [];
 
   const totalArtisans = artisans.length;
   const totalCustomers = customers.length;
 
-  // ─── Derived values ──────────────────────────────────────
   const avatarUrl = user.profile_picture || null;
   const fullName = user.full_name || 'Administrator';
   const email = user.email || '';
@@ -313,24 +278,22 @@ export const AdminDashboard = () => {
   const pctOfTotal = (count) =>
     totalIncidents > 0 ? `${Math.round((count / totalIncidents) * 100)}% of total` : '—';
 
-  // ─── Loading ─────────────────────────────────────────────
   const isLoading = dashboardLoading || artisansLoading || customersLoading;
 
   if (isLoading) {
     return (
-      <div className="admin-dashboard">
-        <div className="profile-skeleton" />
-        <div className="stat-grid">
+      <div className="am-dashboard">
+        <div className="am-skeleton am-skeleton--header" />
+        <div className="am-stat-grid">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="stat-skeleton" />
+            <div key={i} className="am-skeleton am-skeleton--stat" />
           ))}
         </div>
-        <div className="panel-skeleton" />
+        <div className="am-skeleton am-skeleton--panel" />
       </div>
     );
   }
 
-  // ─── Error ────────────────────────────────────────────────
   if (dashboardError || breachesError || atRiskError || artisansError || customersError) {
     const errMsg =
       dashboardError?.message ||
@@ -339,99 +302,75 @@ export const AdminDashboard = () => {
       artisansError?.message ||
       customersError?.message ||
       'Unknown error';
-    console.error('[Dashboard] Error:', { dashboardError, breachesError, atRiskError, artisansError, customersError });
+    console.error('[Dashboard] Error:', {
+      dashboardError, breachesError, atRiskError, artisansError, customersError,
+    });
     return (
-      <div className="admin-dashboard">
-        <div className="state-banner state-banner--error">
-          <IconAlertOctagon className="state-banner__icon" />
+      <div className="am-dashboard">
+        <div className="am-state am-state--error">
+          <IconAlertOctagon className="am-state__icon" />
           <div>
-            <p>Couldn&apos;t load your dashboard.</p>
-            <p className="state-banner__detail">{errMsg}</p>
-            <p className="state-banner__hint">Check the console for more details.</p>
+            <p className="am-state__title">Couldn&apos;t load your dashboard.</p>
+            <p className="am-state__detail">{errMsg}</p>
+            <p className="am-state__hint">Check the console for more details.</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // ─── Render ──────────────────────────────────────────────
   return (
-    <div className="admin-dashboard">
+    <div className="am-dashboard">
       {/* ─── Header ─────────────────────────────────────────── */}
-      <header className="dashboard-header">
-        <div className="agent-profile">
-          <div className="agent-profile__avatar">
+      <header className="am-header">
+        <div className="am-header__profile">
+          <div className="am-avatar">
             {avatarUrl ? (
               <img src={avatarUrl} alt={fullName} />
             ) : (
-              <div className="agent-profile__initial">{fullName.charAt(0).toUpperCase()}</div>
+              <span>{fullName.charAt(0).toUpperCase()}</span>
             )}
           </div>
-          <div className="agent-profile__info">
-            <h2 className="agent-profile__name">{fullName}</h2>
-            <div className="agent-profile__meta">
-              <span className="agent-profile__role">{role}</span>
-              {email && (
-                <>
-                  <span className="agent-profile__dot" aria-hidden="true" />
-                  <span className="agent-profile__email">{email}</span>
-                </>
-              )}
+          <div className="am-header__info">
+            <h2>{fullName}</h2>
+            <div className="am-header__meta">
+              <span className="am-badge am-badge--role">{role}</span>
+              {email && <span className="am-header__email">{email}</span>}
             </div>
           </div>
         </div>
 
-        <div className="admin-dashboard__header">
+        <div className="am-header__title">
+          <span className="am-eyebrow">Overview</span>
           <h1>Admin Dashboard</h1>
           <p>Incident operations, SLA performance and billing at a glance</p>
         </div>
 
-        <div className="admin-dashboard__actions">
-          {/* ─── Invoices button ────────────────────────────── */}
-          <Link to="/billing/invoices" className="btn btn-primary">
-            <FaFileInvoice className="btn-icon" />
+        <div className="am-header__actions">
+          <Link to="/billing/invoices" className="am-btn am-btn--ghost">
+            <FaFileInvoice className="am-btn__icon" />
             Invoices
           </Link>
-          <Link to="/billing/invoices/new" className="btn btn-success">
-            <FaPlusCircle className="btn-icon" />
+          <Link to="/billing/invoices/new" className="am-btn am-btn--primary">
+            <FaPlusCircle className="am-btn__icon" />
             New Invoice
           </Link>
-          <button type="button" onClick={handleLogout} className="logout-btn">
-            <IconLogout className="logout-btn__icon" />
+          <button type="button" onClick={handleLogout} className="am-btn am-btn--danger">
+            <IconLogout className="am-btn__icon" />
             Sign out
           </button>
         </div>
       </header>
 
-      {/* ─── Stat Cards (8 cards in 4×2 grid) ─────────────── */}
-      <div className="stat-grid">
-        <StatCard
-          icon={IconClipboard}
-          color="#3b82f6"
-          value={totalIncidents}
-          label="Total incidents"
-        />
-        <StatCard
-          icon={IconFolderOpen}
-          color="#eab308"
-          value={summary.open_incidents || 0}
-          label="Open incidents"
-        />
-        <StatCard
-          icon={IconCheckCircle}
-          color="#22c55e"
-          value={resolvedIncidents}
-          label="Resolved today"
-        />
-        <StatCard
-          icon={IconClock}
-          color="#ef4444"
-          value={summary.pending_assignments || 0}
-          label="Pending assignments"
-        />
+      {/* ─── Stat Cards ─────────────────────────────────────── */}
+      <section className="am-stat-grid">
+        <StatCard icon={IconClipboard} color="#6366f1" value={totalIncidents} label="Total incidents" />
+        <StatCard icon={IconFolderOpen} color="#f59e0b" value={summary.open_incidents || 0} label="Open incidents" />
+        <StatCard icon={IconCheckCircle} color="#10b981" value={resolvedIncidents} label="Resolved today" />
+        <StatCard icon={IconClock} color="#ef4444" value={summary.pending_assignments || 0} label="Pending assignments" />
         <StatCard
           icon={IconAlertTriangle}
-          color="#eab308"
+          color="#f59e0b"
           value={atRiskCount}
           label="At risk"
           secondaryLabel="Share of total"
@@ -445,22 +384,12 @@ export const AdminDashboard = () => {
           secondaryLabel="Share of total"
           secondaryValue={pctOfTotal(breachCount)}
         />
-        <StatCard
-          icon={IconUsers}
-          color="#8b5cf6"
-          value={totalArtisans}
-          label="Total artisans"
-        />
-        <StatCard
-          icon={IconUser}
-          color="#06b6d4"
-          value={totalCustomers}
-          label="Total customers"
-        />
-      </div>
+        <StatCard icon={IconUsers} color="#8b5cf6" value={totalArtisans} label="Total artisans" />
+        <StatCard icon={IconUser} color="#06b6d4" value={totalCustomers} label="Total customers" />
+      </section>
 
-      {/* ─── Rate Panels ─────────────────────────────────────── */}
-      <div className="progress-grid">
+      {/* ─── Rate Panels ────────────────────────────────────── */}
+      <section className="am-rate-grid">
         <RatePanel
           label="Incident Resolution Rate"
           percent={resolutionRate}
@@ -471,42 +400,63 @@ export const AdminDashboard = () => {
           percent={slaCompliance}
           subtitle={`${Math.max(totalIncidents - breachCount, 0)} of ${totalIncidents} incidents within SLA`}
         />
-      </div>
+      </section>
 
-      {/* ─── Billing Widget ───────────────────────────────────── */}
-      <div className="billing-widget-wrap">
-        <BillingWidget />
-      </div>
-
-      {/* ─── Breached Incidents List ────────────────────────── */}
-      {breachCount > 0 && (
-        <div className="panel">
-          <div className="panel__header">
-            <h3 className="panel__title">Breached incidents</h3>
-            <span className="panel__count">{breachCount}</span>
+      {/* ─── Billing Widget ─────────────────────────────────── */}
+      <section className="am-panel am-panel--billing">
+        <div className="am-panel__header">
+          <div>
+            <span className="am-panel__eyebrow">Finance</span>
+            <h3 className="am-panel__title">Billing overview</h3>
           </div>
-          <div className="breach-list">
+        </div>
+        <BillingWidget />
+      </section>
+
+      {/* ─── Breached Incidents ─────────────────────────────── */}
+      {breachCount > 0 && (
+        <section className="am-panel">
+          <div className="am-panel__header">
+            <div>
+              <span className="am-panel__eyebrow am-panel__eyebrow--danger">Attention</span>
+              <h3 className="am-panel__title">Breached incidents</h3>
+            </div>
+            <span className="am-count am-count--danger">{breachCount}</span>
+          </div>
+          <ul className="am-breach-list">
             {breaches.slice(0, 5).map((item, idx) => (
-              <div key={item.incident || idx} className="breach-row">
-                <span className="breach-row__ref">
+              <li key={item.incident || idx} className="am-breach-row">
+                <span className="am-breach-row__dot" />
+                <span className="am-breach-row__ref">
                   {item.incident_number || item.incident || 'N/A'}
                 </span>
-                <span className="breach-row__status">Breached</span>
-              </div>
+                <span className="am-breach-row__status">Breached</span>
+              </li>
             ))}
-            {breachCount > 5 && (
-              <p className="breach-row__more">+ {breachCount - 5} more breaches</p>
-            )}
-          </div>
-        </div>
+          </ul>
+          {breachCount > 5 && (
+            <p className="am-breach-more">+ {breachCount - 5} more breaches</p>
+          )}
+        </section>
       )}
 
-      {/* ─── Charts ──────────────────────────────────────────── */}
-      <div className="panel-grid">
-        <div className="panel">
-          <h3 className="panel__title">Incident trend (last 30 days)</h3>
+      {/* ─── Charts ─────────────────────────────────────────── */}
+      <section className="am-panel-grid">
+        <div className="am-panel">
+          <div className="am-panel__header">
+            <div>
+              <span className="am-panel__eyebrow">Trend</span>
+              <h3 className="am-panel__title">Incident trend · 30 days</h3>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={trends.incidents_daily || []}>
+              <defs>
+                <linearGradient id="amIncidentStroke" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#8b5cf6" />
+                </linearGradient>
+              </defs>
               <CartesianGrid stroke={GRID_STROKE} vertical={false} />
               <XAxis dataKey="day" tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={false} />
               <YAxis tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={false} />
@@ -514,18 +464,30 @@ export const AdminDashboard = () => {
               <Line
                 type="monotone"
                 dataKey="count"
-                stroke="#60a5fa"
-                strokeWidth={2}
+                stroke="url(#amIncidentStroke)"
+                strokeWidth={2.5}
                 dot={false}
+                activeDot={{ r: 5, fill: '#6366f1', stroke: '#fff', strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="panel">
-          <h3 className="panel__title">Call volume (last 30 days)</h3>
+        <div className="am-panel">
+          <div className="am-panel__header">
+            <div>
+              <span className="am-panel__eyebrow">Volume</span>
+              <h3 className="am-panel__title">Call volume · 30 days</h3>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={trends.calls_daily || []}>
+              <defs>
+                <linearGradient id="amCallStroke" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#f59e0b" />
+                  <stop offset="100%" stopColor="#fbbf24" />
+                </linearGradient>
+              </defs>
               <CartesianGrid stroke={GRID_STROKE} vertical={false} />
               <XAxis dataKey="day" tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={false} />
               <YAxis tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={false} />
@@ -533,17 +495,22 @@ export const AdminDashboard = () => {
               <Line
                 type="monotone"
                 dataKey="count"
-                stroke="#a78bfa"
-                strokeWidth={2}
+                stroke="url(#amCallStroke)"
+                strokeWidth={2.5}
                 dot={false}
+                activeDot={{ r: 5, fill: '#f59e0b', stroke: '#fff', strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* ─── Incidents by priority ────────────────────────── */}
-        <div className="panel">
-          <h3 className="panel__title">Incidents by priority</h3>
+        <div className="am-panel">
+          <div className="am-panel__header">
+            <div>
+              <span className="am-panel__eyebrow">Distribution</span>
+              <h3 className="am-panel__title">Incidents by priority</h3>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -552,7 +519,9 @@ export const AdminDashboard = () => {
                 nameKey="priority"
                 cx="50%"
                 cy="50%"
-                outerRadius={80}
+                innerRadius={45}
+                outerRadius={82}
+                paddingAngle={3}
                 label={({ priority }) => getPriorityLabel(priority)}
                 labelLine={false}
               >
@@ -560,27 +529,34 @@ export const AdminDashboard = () => {
                   <Cell
                     key={index}
                     fill={COLORS[index % COLORS.length]}
-                    stroke="#0a0e1a"
+                    stroke="#ffffff"
                     strokeWidth={2}
                   />
                 ))}
               </Pie>
               <Tooltip
                 {...TOOLTIP_STYLE}
-                formatter={(value, name, props) => {
-                  const label = getPriorityLabel(props.payload.priority);
-                  return [value, label];
-                }}
+                formatter={(value, name, props) => [value, getPriorityLabel(props.payload.priority)]}
               />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
-        {/* ─── Incidents by status ──────────────────────────── */}
-        <div className="panel">
-          <h3 className="panel__title">Incidents by status</h3>
+        <div className="am-panel">
+          <div className="am-panel__header">
+            <div>
+              <span className="am-panel__eyebrow">Breakdown</span>
+              <h3 className="am-panel__title">Incidents by status</h3>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={distribution.status || []}>
+              <defs>
+                <linearGradient id="amBarFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#a5b4fc" />
+                </linearGradient>
+              </defs>
               <CartesianGrid stroke={GRID_STROKE} vertical={false} />
               <XAxis
                 dataKey="status__name"
@@ -589,19 +565,25 @@ export const AdminDashboard = () => {
                 tickLine={false}
               />
               <YAxis tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={false} />
-              <Tooltip {...TOOLTIP_STYLE} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
-              <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Tooltip {...TOOLTIP_STYLE} />
+              <Bar dataKey="count" fill="url(#amBarFill)" radius={[6, 6, 0, 0]} maxBarSize={48} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </section>
 
-      {/* ─── Top Artisans ────────────────────────────────────── */}
-      <div className="panel">
-        <h3 className="panel__title">Top artisans (completion rate)</h3>
+      {/* ─── Top Artisans ───────────────────────────────────── */}
+      <section className="am-panel">
+        <div className="am-panel__header">
+          <div>
+            <span className="am-panel__eyebrow">Performance</span>
+            <h3 className="am-panel__title">Top artisans · completion rate</h3>
+          </div>
+        </div>
+
         {performance.top_artisans?.length > 0 ? (
-          <div className="panel-table-wrap">
-            <table className="panel-table">
+          <div className="am-table-wrap">
+            <table className="am-table">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -613,13 +595,15 @@ export const AdminDashboard = () => {
               <tbody>
                 {performance.top_artisans.map((artisan, idx) => (
                   <tr key={idx}>
-                    <td>{artisan.name}</td>
-                    <td>{artisan.total}</td>
-                    <td>{artisan.completed}</td>
-                    <td>
+                    <td data-label="Name">
+                      <span className="am-table__name">{artisan.name}</span>
+                    </td>
+                    <td data-label="Total assignments">{artisan.total}</td>
+                    <td data-label="Completed">{artisan.completed}</td>
+                    <td data-label="Rate">
                       <span
-                        className="rate-pill"
-                        style={{ '--rate-color': rateColor(artisan.rate).color }}
+                        className="am-pill"
+                        style={{ '--pill-color': rateColor(artisan.rate).color }}
                       >
                         {artisan.rate}%
                       </span>
@@ -630,9 +614,9 @@ export const AdminDashboard = () => {
             </table>
           </div>
         ) : (
-          <p className="panel-empty">No artisan data yet.</p>
+          <p className="am-empty">No artisan data yet.</p>
         )}
-      </div>
+      </section>
     </div>
   );
 };

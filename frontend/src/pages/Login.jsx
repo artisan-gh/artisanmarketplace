@@ -8,6 +8,10 @@ import {
   FaEye,
   FaEyeSlash,
   FaExclamationCircle,
+  FaShieldAlt,
+  FaBolt,
+  FaUsers,
+  FaCheckCircle,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import "./Login.css";
@@ -24,6 +28,24 @@ const DASHBOARD_ROUTES = {
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const HIGHLIGHTS = [
+  {
+    icon: FaShieldAlt,
+    title: "Verified artisans",
+    text: "Every professional is vetted and identity-checked.",
+  },
+  {
+    icon: FaBolt,
+    title: "Instant matching",
+    text: "Get connected with the right pro in seconds.",
+  },
+  {
+    icon: FaUsers,
+    title: "Trusted community",
+    text: "Thousands of jobs completed across Ghana.",
+  },
+];
 
 export default function Login() {
   const navigate = useNavigate();
@@ -80,7 +102,6 @@ export default function Login() {
       const actualType = userData?.user_type || response?.user_type;
 
       if (!actualType || !DASHBOARD_ROUTES[actualType]) {
-        // Fallback: if no valid role, go to /dashboard
         navigate("/dashboard", { replace: true });
         return;
       }
@@ -99,10 +120,8 @@ export default function Login() {
 
   if (checkingAuth) {
     return (
-      <div className="session-check" role="status" aria-label="Checking session">
-        <div className="session-spinner">
-          <div className="session-spinner-ring" />
-        </div>
+      <div className="am-session-check" role="status" aria-label="Checking session">
+        <span className="am-spinner am-spinner--lg" />
       </div>
     );
   }
@@ -111,41 +130,79 @@ export default function Login() {
   const passwordId = `${idPrefix}-password`;
 
   return (
-    <div className="login-page">
-      <div className="glow-field" aria-hidden="true">
-        <div className="glow glow-blue" />
-        <div className="glow glow-purple" />
-        <div className="glow glow-indigo" />
-      </div>
+    <div className="am-login">
+      <div className="am-login__glow am-login__glow--a" aria-hidden="true" />
+      <div className="am-login__glow am-login__glow--b" aria-hidden="true" />
 
       <motion.div
-        initial={{ opacity: 0, y: 28, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-        className="login-card-wrap"
+        className="am-shell"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="login-card">
-          <div className="brand">
-            <div className="brand-badge">
-              <FaSignInAlt aria-hidden="true" />
+        {/* SIDEBAR */}
+        <aside className="am-sidebar">
+          <Link to="/" className="am-brand">
+            <div className="am-brand__mark">
+              <FaSignInAlt />
             </div>
-            <h1>
-              Artisan <span className="brand-gradient-text">Marketplace</span>
-            </h1>
-            <p>Connect with trusted professionals</p>
+            <div className="am-brand__text">
+              <strong>Artisan</strong>
+              <span>Marketplace</span>
+            </div>
+          </Link>
+
+          <div className="am-sidebar__intro">
+            <h2>Welcome back</h2>
+            <p>
+              Sign in to manage your jobs, track earnings, and connect with
+              clients across Ghana.
+            </p>
           </div>
 
-          <h2 className="form-heading">Welcome back</h2>
+          <ul className="am-highlights">
+            {HIGHLIGHTS.map(({ icon: Icon, title, text }) => (
+              <li key={title} className="am-highlight">
+                <span className="am-highlight__icon">
+                  <Icon />
+                </span>
+                <div>
+                  <strong>{title}</strong>
+                  <span>{text}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="am-sidebar__footer">
+            <FaShieldAlt />
+            <span>256-bit encrypted · Secure sign in</span>
+          </div>
+        </aside>
+
+        {/* MAIN */}
+        <main className="am-main am-main--login">
+          <header className="am-main__header">
+            <div className="am-main__heading">
+              <span className="am-eyebrow">Sign in</span>
+              <h1>Access your account</h1>
+              <p>Enter your credentials to continue.</p>
+            </div>
+
+            <Link to="/register" className="am-signin-link">
+              Create account
+            </Link>
+          </header>
 
           <AnimatePresence>
             {errorMessage && (
               <motion.div
                 role="alert"
                 aria-live="assertive"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="error-banner"
+                className="am-alert"
+                initial={{ opacity: 0, y: -8, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -8, height: 0 }}
               >
                 <FaExclamationCircle aria-hidden="true" />
                 <span>{errorMessage}</span>
@@ -153,11 +210,13 @@ export default function Login() {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleSubmit} className="login-form" noValidate>
-            <div className="field-group">
-              <label htmlFor={emailId} className="field-label">Email Address</label>
-              <div className="input-wrap">
-                <FaUser className="input-icon" aria-hidden="true" />
+          <form onSubmit={handleSubmit} className="am-form" noValidate>
+            <div className="am-field">
+              <label htmlFor={emailId}>Email address</label>
+              <div className="am-input has-icon">
+                <span className="am-input__icon">
+                  <FaUser aria-hidden="true" />
+                </span>
                 <input
                   id={emailId}
                   name="email"
@@ -166,21 +225,22 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="text-input"
                   placeholder="you@example.com"
                 />
               </div>
             </div>
 
-            <div className="field-group">
-              <div className="field-row">
-                <label htmlFor={passwordId} className="field-label">Password</label>
-                <Link to="/forgot-password" className="forgot-link">
+            <div className="am-field">
+              <div className="am-field__row">
+                <label htmlFor={passwordId}>Password</label>
+                <Link to="/forgot-password" className="am-link">
                   Forgot password?
                 </Link>
               </div>
-              <div className="input-wrap">
-                <FaLock className="input-icon" aria-hidden="true" />
+              <div className="am-input has-icon has-trailing">
+                <span className="am-input__icon">
+                  <FaLock aria-hidden="true" />
+                </span>
                 <input
                   id={passwordId}
                   name="password"
@@ -190,7 +250,6 @@ export default function Login() {
                   minLength={1}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="text-input has-toggle"
                   placeholder="••••••••"
                 />
                 <button
@@ -198,7 +257,7 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   aria-pressed={showPassword}
-                  className="password-toggle"
+                  className="am-input__action"
                 >
                   <AnimatePresence mode="wait" initial={false}>
                     {showPassword ? (
@@ -232,35 +291,45 @@ export default function Login() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+              whileHover={{ scale: isLoading ? 1 : 1.01 }}
+              whileTap={{ scale: 0.98 }}
               aria-busy={isLoading}
-              className="submit-btn"
+              className="am-btn am-btn--primary am-btn--cta am-btn--block"
             >
               {isLoading ? (
                 <>
-                  <span className="spinner" aria-hidden="true" />
-                  <span className="sr-only">Signing in…</span>
+                  <span className="am-spinner am-spinner--sm" aria-hidden="true" />
+                  <span>Signing in…</span>
                 </>
               ) : (
                 <>
+                  Sign in
                   <FaSignInAlt aria-hidden="true" />
-                  Sign In
                 </>
               )}
             </motion.button>
           </form>
 
-          <div className="login-footer">
+          <div className="am-footnote am-footnote--center">
+            <FaCheckCircle />
+            <span>Your credentials are encrypted end-to-end.</span>
+          </div>
+
+          <div className="am-login__signup">
             <p>
-              Don't have an account?{" "}
-              <Link to="/register" className="signup-link">
+              Don&apos;t have an account?{" "}
+              <Link to="/register" className="am-link am-link--strong">
                 Sign up
               </Link>
             </p>
           </div>
-        </div>
+        </main>
       </motion.div>
+
+      <footer className="am-page-footer">
+        <span>© {new Date().getFullYear()} Artisan Marketplace</span>
+        <span>Professional services made simple.</span>
+      </footer>
     </div>
   );
 }

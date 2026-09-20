@@ -559,3 +559,16 @@ class UserSessionAdmin(admin.ModelAdmin):
         self.message_user(request, f"{updated} sessions revoked.")
 
     actions = [revoke_sessions]
+
+
+from .models import OTPCode  # noqa: E402
+
+
+@admin.register(OTPCode)
+class OTPCodeAdmin(admin.ModelAdmin):
+    list_display = ("phone", "code", "purpose", "attempts", "used_at", "created_at")
+    list_filter = ("purpose", "used_at")
+    search_fields = ("phone",)
+    date_hierarchy = "created_at"
+    readonly_fields = ("phone", "code", "purpose", "attempts",
+                       "used_at", "created_at", "ip_address")

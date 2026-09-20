@@ -1,0 +1,19 @@
+
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  <p>Linking <strong>{{ items|length }}</strong> customer(s) to a CLIENT app account.</p>
+  <ul>{% for c in items %}<li><strong>{{ c.name|default:"(no name)" }}</strong> — {{ c.phone }}</li>{% endfor %}</ul>
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+    <div style="margin:20px 0;padding:16px;background:#f8fafc;border-radius:8px;">
+      <label for="{{ form.phone.id_for_label }}" style="display:block;font-weight:600;margin-bottom:6px;">{{ form.phone.label }}</label>
+      {{ form.phone }}
+      {% if form.phone.help_text %}<p style="color:#64748b;margin-top:6px;">{{ form.phone.help_text }}</p>{% endif %}
+    </div>
+    <input type="hidden" name="apply" value="1" />
+    <input type="submit" class="default" value="Link" />
+    <a href="{% url 'admin:customers_customer_changelist' %}" style="margin-left:12px;">Cancel</a>
+  </form>
+{% endblock %}

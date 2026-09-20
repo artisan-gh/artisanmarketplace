@@ -560,3 +560,24 @@ class AdminProfile(models.Model):
 
     def __str__(self):
         return f"Admin: {self.user.email}"
+
+# === OTP_CODE_MODEL ===
+class OTPCode(models.Model):
+    PURPOSE = [("login", "Login"), ("verify", "Verify phone")]
+    phone = models.CharField(max_length=20, db_index=True)
+    code = models.CharField(max_length=6)
+    purpose = models.CharField(max_length=16, choices=PURPOSE, default="login")
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["phone", "created_at"]),
+            models.Index(fields=["phone", "used_at"]),
+        ]
+    def __str__(self):
+        return f"{self.phone} · {self.code} · used={bool(self.used_at)}"
+# === /OTP_CODE_MODEL ===

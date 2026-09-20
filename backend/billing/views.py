@@ -4,6 +4,7 @@ import requests
 import hmac
 import hashlib
 from django.conf import settings
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from rest_framework import viewsets, permissions, filters, status
@@ -31,9 +32,11 @@ from .serializers import (
     PaymentIntentListSerializer,
     PaystackInitializeSerializer, PaystackWebhookSerializer,
     RefundSerializer, InvoiceStatusTransitionSerializer,
-    InvoiceApprovalActionSerializer, PaymentAllocationCreateSerializer
+    InvoiceApprovalActionSerializer, PaymentAllocationCreateSerializer,
+    PublicInvoiceSerializer
 )
 from accounts.permissions import IsAdminOrStaff
+from .paystack import initialize_payment as paystack_init, PaystackError
 from .services import PaymentService, InvoiceService, ApprovalWorkflow, JournalEntryService
 
 
@@ -60,6 +63,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
     search_fields = ['invoice_number', 'customer__name', 'customer__email']
     ordering_fields = ['created_at', 'due_date', 'grand_total']
     ordering = ['-created_at']
+    lookup_value_regex = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
     def get_queryset(self):
         user = self.request.user
@@ -192,97 +196,51 @@ class InvoiceViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        customer_email = invoice.customer.email
-        if not customer_email:
-            return Response(
-                {'error': 'Customer email is required for payment. Please update the customer record.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        paystack_secret = getattr(settings, 'PAYSTACK_SECRET_KEY', None)
-        if not paystack_secret:
-            return Response(
-                {'error': 'Paystack secret key not configured.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-        callback_url = serializer.validated_data.get('callback_url') or \
-                       getattr(settings, 'PAYSTACK_CALLBACK_URL', None)
-        if not callback_url:
-            return Response(
-                {'error': 'Callback URL not configured.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-        amount = invoice.amount_in_smallest_unit
-        if amount <= 0:
-            return Response(
-                {'error': f'Invalid amount: {amount}. Grand total: {invoice.grand_total}'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        paystack_url = 'https://api.paystack.co/transaction/initialize'
-        headers = {
-            'Authorization': f'Bearer {paystack_secret}',
-            'Content-Type': 'application/json',
-        }
-        payload = {
-            'amount': amount,
-            'email': customer_email,
-            'reference': f'INV-{invoice.id.hex[:8]}-{int(timezone.now().timestamp())}',
-            'callback_url': callback_url,
-            'currency': invoice.currency or 'GHS',
-            'metadata': {
-                'invoice_id': str(invoice.id),
-                'invoice_number': invoice.invoice_number,
-                'customer_id': str(invoice.customer.id),
-                'customer_name': invoice.customer.name,
-            }
-        }
-
-        print(f"🔵 Paystack Payload: {payload}")
-
         try:
-            resp = requests.post(paystack_url, json=payload, headers=headers, timeout=30)
-            resp.raise_for_status()
-            result = resp.json()
-            print(f"✅ Paystack Response: {result}")
-        except requests.exceptions.RequestException as e:
-            print(f"❌ Paystack request error: {str(e)}")
-            if hasattr(e, 'response') and e.response:
-                print(f"Response body: {e.response.text}")
-                try:
-                    error_data = e.response.json()
-                    error_msg = error_data.get('message', str(e))
-                except:
-                    error_msg = str(e)
-                return Response(
-                    {'error': f'Paystack error: {error_msg}'},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            result = paystack_init(invoice)
+        except PaystackError as e:
             return Response(
-                {'error': f'Paystack error: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {'error': e.message},
+                status=e.status_code or status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        if not result.get('status'):
-            error_msg = result.get('message', 'Paystack initialization failed.')
-            print(f"❌ Paystack returned error: {error_msg}")
-            return Response(
-                {'error': error_msg},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        invoice.paystack_reference = result['data']['reference']
-        invoice.paystack_access_code = result['data']['access_code']
-        invoice.status = 'SENT'
-        invoice.save(update_fields=['paystack_reference', 'paystack_access_code', 'status'])
+        if invoice.status == 'DRAFT':
+            invoice.status = 'SENT'
+            invoice.save(update_fields=['status', 'updated_at'])
 
         return Response({
-            'authorization_url': result['data']['authorization_url'],
-            'reference': result['data']['reference'],
-            'access_code': result['data']['access_code'],
-            'invoice': InvoiceDetailSerializer(invoice).data
+            'authorization_url': result['authorization_url'],
+            'reference': result['reference'],
+            'access_code': result['access_code'],
+            'invoice': InvoiceDetailSerializer(invoice).data,
+        })
+
+    @action(detail=False, methods=['post'],
+            url_path='public/(?P<token>[^/.]+)/pay',
+            permission_classes=[])
+    def public_pay(self, request, token=None):
+        try:
+            invoice = Invoice.objects.select_related('customer').get(
+                public_token=token, is_deleted=False,
+            )
+        except Invoice.DoesNotExist:
+            return Response({'error': 'Invoice not found'},
+                            status=status.HTTP_404_NOT_FOUND)
+        if invoice.status in ('PAID', 'CANCELLED', 'VOID'):
+            return Response({'error': f'Invoice is {invoice.status.lower()}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        try:
+            result = paystack_init(invoice)
+        except PaystackError as e:
+            return Response({'error': e.message},
+                            status=e.status_code or status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if invoice.status == 'DRAFT':
+            invoice.status = 'SENT'
+            invoice.save(update_fields=['status', 'updated_at'])
+        return Response({
+            'authorization_url': result['authorization_url'],
+            'reference': result['reference'],
+            'access_code': result['access_code'],
         })
 
     @action(detail=False, methods=['post'], url_path='webhook', permission_classes=[])
@@ -296,14 +254,16 @@ class InvoiceViewSet(viewsets.ModelViewSet):
 
         paystack_secret = getattr(settings, 'PAYSTACK_SECRET_KEY', None)
         signature = request.headers.get('x-paystack-signature')
-        if paystack_secret and signature:
-            computed = hmac.new(
-                paystack_secret.encode(),
-                request.body,
-                hashlib.sha512
-            ).hexdigest()
-            if not hmac.compare_digest(signature, computed):
-                return Response({'error': 'Invalid signature'}, status=status.HTTP_401_UNAUTHORIZED)
+        if not paystack_secret:
+            return Response({'error': 'Webhook not configured'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if not signature:
+            return Response({'error': 'Missing signature'},
+                            status=status.HTTP_401_UNAUTHORIZED)
+        computed = hmac.new(paystack_secret.encode(), request.body, hashlib.sha512).hexdigest()
+        if not hmac.compare_digest(signature, computed):
+            return Response({'error': 'Invalid signature'},
+                            status=status.HTTP_401_UNAUTHORIZED)
 
         webhook_log = WebhookLog.objects.create(
             gateway='PAYSTACK',
@@ -319,34 +279,42 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         if event == 'charge.success':
             reference = data.get('reference')
             if reference:
-                invoice = Invoice.objects.filter(paystack_reference=reference).first()
-                if invoice and invoice.status != 'PAID':
-                    payment = Payment.objects.create(
-                        customer=invoice.customer,
-                        amount=invoice.grand_total,
-                        currency=invoice.currency,
-                        method='PAYSTACK',
-                        gateway='PAYSTACK',
-                        gateway_reference=reference,
-                        status='SUCCESS',
-                        paid_at=timezone.now(),
-                        metadata={'webhook': data}
-                    )
-                    PaymentAllocation.objects.create(
-                        payment=payment,
-                        invoice=invoice,
-                        amount=invoice.grand_total
-                    )
-                    invoice.update_paid_amount()
-                    invoice.create_payment_journal_entry()
-                    InvoiceHistory.objects.create(
-                        invoice=invoice,
-                        action='PAID',
-                        reason='Payment received via Paystack webhook'
-                    )
+                with transaction.atomic():
+                    invoice = (Invoice.objects.select_for_update()
+                               .filter(paystack_reference=reference).first())
+                    if not invoice:
+                        webhook_log.status = 'IGNORED'
+                        webhook_log.error_message = f'No invoice with ref {reference}'
+                        webhook_log.save(update_fields=['status', 'error_message'])
+                        return Response({'status': 'ignored'})
+                    if Payment.objects.filter(gateway_reference=reference).exists():
+                        webhook_log.processed = True
+                        webhook_log.status = 'ALREADY_PROCESSED'
+                        webhook_log.save(update_fields=['processed', 'status'])
+                        return Response({'status': 'already_processed'})
+                    if invoice.status != 'PAID':
+                        payment = Payment.objects.create(
+                            customer=invoice.customer,
+                            amount=invoice.grand_total,
+                            currency=invoice.currency,
+                            method='PAYSTACK',
+                            gateway='PAYSTACK',
+                            gateway_reference=reference,
+                            status='SUCCESS',
+                            paid_at=timezone.now(),
+                            metadata={'webhook': data},
+                        )
+                        PaymentAllocation.objects.create(
+                            payment=payment, invoice=invoice,
+                            amount=invoice.grand_total)
+                        invoice.update_paid_amount()
+                        invoice.create_payment_journal_entry()
+                        InvoiceHistory.objects.create(
+                            invoice=invoice, action='PAID',
+                            reason='Payment received via Paystack webhook')
                     webhook_log.processed = True
                     webhook_log.status = 'PROCESSED'
-                    webhook_log.save()
+                    webhook_log.save(update_fields=['processed', 'status'])
 
         return Response({'status': 'success'})
 
@@ -489,8 +457,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         except Invoice.DoesNotExist:
             return Response({'error': 'Invoice not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = InvoiceDetailSerializer(invoice)
-        return Response(serializer.data)
+        return Response(PublicInvoiceSerializer(invoice).data)
 
 
 # ─── Payment ViewSet ─────────────────────────────────────────
@@ -503,6 +470,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
     search_fields = ['gateway_reference', 'customer__name']
     ordering_fields = ['paid_at', 'created_at', 'amount']
     ordering = ['-created_at']
+    lookup_value_regex = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
     def get_serializer_class(self):
         if self.action == 'list':

@@ -127,7 +127,9 @@ INSTALLED_APPS = [
     'incidents',
     'attachments',
     'comments', 
-    'assignments',
+    'assignments',    
+    "provider",
+
 ]
 
 # ------------------------------------------------------------------------------
@@ -425,3 +427,36 @@ JAZZMIN_SETTINGS = {
 JAZZMIN_UI_TWEAKS = {
     "theme": "darkly",
 }
+
+# === CLIENT OTP ===
+import os as _os
+SMS_BACKEND = _os.environ.get("SMS_BACKEND", "console")
+HUBTEL_CLIENT_ID = _os.environ.get("HUBTEL_CLIENT_ID", "")
+HUBTEL_CLIENT_SECRET = _os.environ.get("HUBTEL_CLIENT_SECRET", "")
+HUBTEL_SENDER_ID = _os.environ.get("HUBTEL_SENDER_ID", "Tumakonect")
+OTP_TTL_SECONDS = 300
+OTP_MAX_ATTEMPTS = 3
+OTP_MAX_PER_HOUR = 5
+OTP_MAX_PER_HOUR_PER_IP = 20
+CACHES = {"default": {"BACKEND": _os.environ.get(
+    "CACHE_BACKEND", "django.core.cache.backends.locmem.LocMemCache"),
+    "LOCATION": _os.environ.get("CACHE_LOCATION", "otp-cache")}}
+# === /CLIENT OTP ===
+
+# === OTP THROTTLE ===
+REST_FRAMEWORK = dict(globals().get("REST_FRAMEWORK", {}))
+REST_FRAMEWORK.setdefault("DEFAULT_THROTTLE_CLASSES", [])
+REST_FRAMEWORK.setdefault("DEFAULT_THROTTLE_RATES", {})
+REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["otp_send"] = "5/hour"
+# === /OTP THROTTLE ===
+
+# === CLIENT PAYMENTS ===
+import os as _os
+PAYSTACK_SECRET_KEY = _os.environ.get("PAYSTACK_SECRET_KEY", "")
+PAYSTACK_PUBLIC_KEY = _os.environ.get("PAYSTACK_PUBLIC_KEY", "")
+PAYSTACK_CALLBACK_URL = _os.environ.get(
+    "PAYSTACK_CALLBACK_URL",
+    "http://127.0.0.1:8000/api/billing/invoices/verify/",
+)
+FRONTEND_URL = _os.environ.get("FRONTEND_URL", "http://localhost:5173")
+# === /CLIENT PAYMENTS ===

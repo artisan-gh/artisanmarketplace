@@ -1950,3 +1950,23 @@ class PaystackWebhookSerializer(serializers.Serializer):
     event = serializers.CharField()
 
     data = serializers.JSONField()
+
+
+# ============================================================
+# PUBLIC INVOICE
+# ============================================================
+
+class PublicInvoiceSerializer(serializers.ModelSerializer):
+    items = InvoiceItemSerializer(many=True, read_only=True)
+    customer_name = serializers.CharField(source="customer.name", read_only=True)
+
+    class Meta:
+        model = Invoice
+        fields = ["invoice_number", "status", "currency",
+                  "subtotal", "tax_amount", "discount_amount",
+                  "materials_total", "transport_cost",
+                  "grand_total", "amount_paid", "balance_due",
+                  "issued_date", "due_date", "paid_date",
+                  "billing_name", "billing_address", "billing_phone",
+                  "notes", "terms", "items", "customer_name"]
+        read_only_fields = fields

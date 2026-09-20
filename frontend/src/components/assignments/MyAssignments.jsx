@@ -2,8 +2,26 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { getMyAssignments } from '../../api/assignmentsAPI';
-import { acceptAssignment, startAssignment, completeAssignment } from '../../api/assignmentsAPI';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  FaSync,
+  FaSearch,
+  FaPhone,
+  FaCalendarAlt,
+  FaClock,
+  FaPlay,
+  FaCheck,
+  FaExclamationTriangle,
+  FaInbox,
+  FaListAlt,
+  FaArrowLeft,
+} from 'react-icons/fa';
+import {
+  getMyAssignments,
+  acceptAssignment,
+  startAssignment,
+  completeAssignment,
+} from '../../api/assignmentsAPI';
 import { StatusBadge } from '../common/StatusBadge';
 import './MyAssignments.css';
 
@@ -12,12 +30,29 @@ const PRIORITY_COLORS = {
   LOW: '#64748b',
   MEDIUM: '#3b82f6',
   HIGH: '#f59e0b',
-  CRITICAL: '#f87171',
-  URGENT: '#f87171',
+  CRITICAL: '#ef4444',
+  URGENT: '#ef4444',
 };
 
 const getPriorityColor = (priority) =>
   PRIORITY_COLORS[priority?.toUpperCase()] || '#94a3b8';
+
+const FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'in_progress', label: 'In progress' },
+  { value: 'completed', label: 'Completed' },
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.04 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+};
 
 export const MyAssignments = () => {
   const queryClient = useQueryClient();
@@ -65,12 +100,15 @@ export const MyAssignments = () => {
   }, [assignments, filterStatus, searchTerm]);
 
   // ─── Stats ───────────────────────────────────────────────────
-  const stats = useMemo(() => ({
-    total: assignments.length,
-    pending: assignments.filter((a) => a.status?.toLowerCase() === 'pending').length,
-    inProgress: assignments.filter((a) => a.status?.toLowerCase() === 'in_progress').length,
-    completed: assignments.filter((a) => a.status?.toLowerCase() === 'completed').length,
-  }), [assignments]);
+  const stats = useMemo(
+    () => ({
+      total: assignments.length,
+      pending: assignments.filter((a) => a.status?.toLowerCase() === 'pending').length,
+      inProgress: assignments.filter((a) => a.status?.toLowerCase() === 'in_progress').length,
+      completed: assignments.filter((a) => a.status?.toLowerCase() === 'completed').length,
+    }),
+    [assignments]
+  );
 
   const handleAction = (id, mutation, actionName) => {
     if (window.confirm(`Are you sure you want to ${actionName} this assignment?`)) {
@@ -78,140 +116,287 @@ export const MyAssignments = () => {
     }
   };
 
-  if (isLoading) return <div className="my-assignments__loading">Loading your assignments...</div>;
-  if (error) return <div className="my-assignments__error">Failed to load assignments.</div>;
+  if (isLoading) {
+    return (
+      <div className="ma-page">
+        <div className="ma-shell">
+          <div className="ma-skeleton ma-skeleton--header" />
+          <div className="ma-skeleton ma-skeleton--panel" />
+          <div className="ma-skeleton ma-skeleton--panel" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="ma-page">
+        <div className="ma-shell">
+          <motion.div
+            className="ma-state ma-state--error"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="ma-state__icon">
+              <FaExclamationTriangle />
+            </div>
+            <div>
+              <h3>Failed to load assignments</h3>
+              <p>Something went wrong while fetching your assignments. Please try again.</p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="my-assignments">
-      <div className="my-assignments__header">
-        <h1>My Assignments</h1>
-        <div className="my-assignments__stats">
-          <span className="stat-badge">Total: {stats.total}</span>
-          <span className="stat-badge stat-badge--pending">Pending: {stats.pending}</span>
-          <span className="stat-badge stat-badge--progress">In Progress: {stats.inProgress}</span>
-          <span className="stat-badge stat-badge--completed">Completed: {stats.completed}</span>
-        </div>
-        <button className="refresh-btn" onClick={() => refetch()}>
-          ↻ Refresh
-        </button>
-      </div>
+    <div className="ma-page">
+      <motion.div className="ma-shell" variants={containerVariants} initial="hidden" animate="show">
+        {/* ─── Hero header ─────────────────────────────── */}
+        <motion.header className="ma-hero" variants={itemVariants}>
+          <div className="ma-hero__left">
+            <div className="ma-hero__icon">
+              <FaListAlt />
+            </div>
+            <div>
+              <span className="ma-eyebrow">Workspace</span>
+              <h1>My assignments</h1>
+              <p>Track every job you've been assigned, in one place.</p>
+            </div>
+          </div>
 
-      <div className="my-assignments__filters">
-        <div className="filter-tabs">
-          {['all', 'pending', 'in_progress', 'completed'].map((status) => (
-            <button
-              key={status}
-              className={`filter-tab ${filterStatus === status ? 'active' : ''}`}
-              onClick={() => setFilterStatus(status)}
-            >
-              {status.replace('_', ' ').charAt(0).toUpperCase() + status.slice(1)}
+          <div className="ma-hero__right">
+            <div className="ma-stat-chip">
+              <div className="ma-stat-chip__icon ma-stat-chip__icon--primary">
+                <FaListAlt />
+              </div>
+              <div>
+                <span className="ma-stat-chip__value">{stats.total}</span>
+                <span className="ma-stat-chip__label">Total</span>
+              </div>
+            </div>
+
+            <div className="ma-stat-chip">
+              <div className="ma-stat-chip__icon ma-stat-chip__icon--amber">
+                <FaClock />
+              </div>
+              <div>
+                <span className="ma-stat-chip__value">{stats.pending}</span>
+                <span className="ma-stat-chip__label">Pending</span>
+              </div>
+            </div>
+
+            <div className="ma-stat-chip">
+              <div className="ma-stat-chip__icon ma-stat-chip__icon--violet">
+                <FaPlay />
+              </div>
+              <div>
+                <span className="ma-stat-chip__value">{stats.inProgress}</span>
+                <span className="ma-stat-chip__label">In progress</span>
+              </div>
+            </div>
+
+            <div className="ma-stat-chip">
+              <div className="ma-stat-chip__icon ma-stat-chip__icon--success">
+                <FaCheck />
+              </div>
+              <div>
+                <span className="ma-stat-chip__value">{stats.completed}</span>
+                <span className="ma-stat-chip__label">Completed</span>
+              </div>
+            </div>
+
+            <button type="button" className="ma-refresh" onClick={() => refetch()}>
+              <FaSync />
+              Refresh
             </button>
-          ))}
-        </div>
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search by incident or customer..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
+          </div>
+        </motion.header>
 
-      {filteredAssignments.length === 0 ? (
-        <div className="my-assignments__empty">
-          <p>
-            {searchTerm || filterStatus !== 'all'
-              ? 'No assignments match your filters.'
-              : 'You have no assignments yet.'}
-          </p>
-        </div>
-      ) : (
-        <ul className="assignment-list">
-          {filteredAssignments.map((assignment) => {
-            const isPending = assignment.status?.toLowerCase() === 'pending';
-            const isInProgress = assignment.status?.toLowerCase() === 'in_progress';
+        {/* ─── Toolbar ─────────────────────────────────── */}
+        <motion.section className="ma-toolbar" variants={itemVariants}>
+          <div className="ma-search">
+            <FaSearch className="ma-search__icon" aria-hidden="true" />
+            <input
+              type="text"
+              placeholder="Search by incident or customer…"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-            return (
-              <li key={assignment.id} className="assignment-item">
-                <div className="assignment-item__main">
-                  <div className="assignment-item__ref">
-                    {/* ✅ FIX: use the incident UUID for routing */}
-                    <Link
-                      to={`/incidents/${assignment.incident || assignment.incident_id}`}
-                      className="assignment-item__link"
+          <div className="ma-chip-row">
+            {FILTERS.map((f) => (
+              <button
+                key={f.value}
+                type="button"
+                className={`ma-chip ${filterStatus === f.value ? 'is-active' : ''}`}
+                onClick={() => setFilterStatus(f.value)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* ─── List ────────────────────────────────────── */}
+        <motion.section className="ma-list-card" variants={itemVariants}>
+          <div className="ma-list-card__header">
+            <div className="ma-list-card__title">
+              <FaInbox />
+              <span>Assignments</span>
+            </div>
+            <div className="ma-list-card__meta">
+              Showing <strong>{filteredAssignments.length}</strong> of <strong>{assignments.length}</strong>
+            </div>
+          </div>
+
+          {filteredAssignments.length === 0 ? (
+            <div className="ma-empty">
+              <FaInbox className="ma-empty__icon" />
+              <p>
+                {searchTerm || filterStatus !== 'all'
+                  ? 'No assignments match your filters.'
+                  : 'You have no assignments yet.'}
+              </p>
+            </div>
+          ) : (
+            <ul className="ma-list">
+              <AnimatePresence initial={false}>
+                {filteredAssignments.map((assignment) => {
+                  const isPending = assignment.status?.toLowerCase() === 'pending';
+                  const isInProgress = assignment.status?.toLowerCase() === 'in_progress';
+                  const priorityColor = getPriorityColor(assignment.priority);
+
+                  return (
+                    <motion.li
+                      key={assignment.id}
+                      className="ma-item"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
                     >
-                      {assignment.incident_number}
-                    </Link>
-                    <span
-                      className="priority-badge"
-                      style={{ backgroundColor: getPriorityColor(assignment.priority) }}
-                    >
-                      {assignment.priority || 'N/A'}
-                    </span>
-                    <StatusBadge status={assignment.status?.toLowerCase()}>
-                      {assignment.status}
-                    </StatusBadge>
-                  </div>
-                  <div className="assignment-item__customer">
-                    <span className="customer-name">{assignment.customer || '—'}</span>
-                    {assignment.customer_phone && (
-                      <span className="customer-phone">📞 {assignment.customer_phone}</span>
-                    )}
-                  </div>
-                  <div className="assignment-item__dates">
-                    <span className="date-label">Assigned:</span>
-                    <span>{new Date(assignment.assigned_at).toLocaleDateString()}</span>
-                    {assignment.target_resolution && (
-                      <>
-                        <span className="date-label">Due:</span>
-                        <span className="due-date">
-                          {new Date(assignment.target_resolution).toLocaleDateString()}
+                      {/* Left: ref + priority + status */}
+                      <div className="ma-item__ref">
+                        <Link
+                          to={`/incidents/${assignment.incident || assignment.incident_id}`}
+                          className="ma-item__link"
+                        >
+                          {assignment.incident_number}
+                        </Link>
+
+                        <span
+                          className="ma-priority"
+                          style={{ '--priority-color': priorityColor }}
+                        >
+                          <span className="ma-priority__dot" />
+                          {assignment.priority || 'N/A'}
                         </span>
-                      </>
-                    )}
-                  </div>
-                </div>
 
-                <div className="assignment-item__actions">
-                  {isPending && (
-                    <>
-                      <button
-                        className="btn btn-sm btn-success"
-                        onClick={() => handleAction(assignment.id, acceptMutation, 'accept')}
-                        disabled={acceptMutation.isPending}
-                      >
-                        {acceptMutation.isPending ? '...' : 'Accept'}
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline"
-                        onClick={() => handleAction(assignment.id, startMutation, 'start')}
-                        disabled={startMutation.isPending}
-                      >
-                        {startMutation.isPending ? '...' : 'Start'}
-                      </button>
-                    </>
-                  )}
-                  {isInProgress && (
-                    <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() => handleAction(assignment.id, completeMutation, 'complete')}
-                      disabled={completeMutation.isPending}
-                    >
-                      {completeMutation.isPending ? '...' : 'Complete'}
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                        <StatusBadge status={assignment.status?.toLowerCase()}>
+                          {assignment.status}
+                        </StatusBadge>
+                      </div>
 
-      <div className="my-assignments__footer">
-        <Link to="/dashboard" className="back-link">← Back to Dashboard</Link>
-        <span className="count-info">Showing {filteredAssignments.length} of {assignments.length} assignments</span>
-      </div>
+                      {/* Middle: customer */}
+                      <div className="ma-item__customer">
+                        <strong>{assignment.customer || '—'}</strong>
+                        {assignment.customer_phone && (
+                          <span className="ma-item__phone">
+                            <FaPhone /> {assignment.customer_phone}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Dates */}
+                      <div className="ma-item__dates">
+                        <div>
+                          <span className="ma-item__date-label">Assigned</span>
+                          <span className="ma-item__date-value">
+                            <FaCalendarAlt />
+                            {new Date(assignment.assigned_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        {assignment.target_resolution && (
+                          <div>
+                            <span className="ma-item__date-label">Due</span>
+                            <span className="ma-item__date-value">
+                              <FaClock />
+                              {new Date(assignment.target_resolution).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="ma-item__actions">
+                        {isPending && (
+                          <>
+                            <button
+                              type="button"
+                              className="ma-btn ma-btn--success"
+                              onClick={() => handleAction(assignment.id, acceptMutation, 'accept')}
+                              disabled={acceptMutation.isPending}
+                            >
+                              {acceptMutation.isPending ? (
+                                <span className="ma-spinner ma-spinner--sm" />
+                              ) : (
+                                <FaCheck />
+                              )}
+                              Accept
+                            </button>
+                            <button
+                              type="button"
+                              className="ma-btn ma-btn--ghost"
+                              onClick={() => handleAction(assignment.id, startMutation, 'start')}
+                              disabled={startMutation.isPending}
+                            >
+                              {startMutation.isPending ? (
+                                <span className="ma-spinner ma-spinner--sm ma-spinner--dark" />
+                              ) : (
+                                <FaPlay />
+                              )}
+                              Start
+                            </button>
+                          </>
+                        )}
+
+                        {isInProgress && (
+                          <button
+                            type="button"
+                            className="ma-btn ma-btn--primary"
+                            onClick={() =>
+                              handleAction(assignment.id, completeMutation, 'complete')
+                            }
+                            disabled={completeMutation.isPending}
+                          >
+                            {completeMutation.isPending ? (
+                              <span className="ma-spinner ma-spinner--sm" />
+                            ) : (
+                              <FaCheck />
+                            )}
+                            Complete
+                          </button>
+                        )}
+                      </div>
+                    </motion.li>
+                  );
+                })}
+              </AnimatePresence>
+            </ul>
+          )}
+        </motion.section>
+
+        {/* ─── Footer ──────────────────────────────────── */}
+        <motion.div className="ma-footer" variants={itemVariants}>
+          <Link to="/artisan/dashboard" className="ma-back-link">
+            <FaArrowLeft />
+            Back to dashboard
+          </Link>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

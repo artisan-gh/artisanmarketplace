@@ -1,191 +1,740 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* =========================================================
+   Artisan Marketplace — Incident List
+   Styled to match Login.css (light theme, shared tokens)
+   ========================================================= */
 
-/* ─── Tokens (kept local so this file drops in standalone) ─── */
-.incident-list-page {
-  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+:root {
+  --am-bg: #0b0f1a;
+  --am-surface: #ffffff;
+  --am-ink-900: #0f172a;
+  --am-ink-700: #334155;
+  --am-ink-500: #64748b;
+  --am-ink-300: #cbd5e1;
+  --am-line: #e6e9f2;
+  --am-line-strong: #d8dceb;
 
-  --bg-elevated: #10151f;
-  --bg-elevated-2: #141b28;
-  --surface: rgba(255, 255, 255, 0.03);
-  --surface-hover: rgba(255, 255, 255, 0.05);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --am-primary: #4f46e5;
+  --am-primary-600: #4338ca;
+  --am-primary-50: #eef2ff;
+  --am-accent: #f59e0b;
+  --am-success: #10b981;
+  --am-danger: #ef4444;
+  --am-violet: #8b5cf6;
 
-  --text-primary: #eef1f7;
-  --text-secondary: #9aa4b8;
-  --text-tertiary: #626c82;
+  --am-radius-lg: 22px;
+  --am-radius-md: 14px;
+  --am-radius-sm: 10px;
 
-  --accent: #5b8cff;
-  --bad: #f2495c;
+  --am-shadow-lg: 0 30px 80px -30px rgba(15, 23, 42, 0.35);
+  --am-shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.08);
+  --am-shadow-focus: 0 0 0 4px rgba(79, 70, 229, 0.15);
 
-  font-family: var(--font-ui);
-  color: var(--text-primary);
+  --am-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---------- Page wrapper (matches .am-login) ---------- */
+
+.il-page {
+  position: relative;
+  min-height: 100vh;
+  padding: clamp(16px, 3vw, 40px);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(79, 70, 229, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(245, 158, 11, 0.08), transparent 55%),
+    linear-gradient(180deg, #f7f8fc 0%, #eef1f9 100%);
+  font-family: var(--am-font);
+  color: var(--am-ink-900);
+}
+
+/* ---------- Shell (matches .am-shell) ---------- */
+
+.il-shell {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+
+/* ---------- Hero header (matches .am-main__header) ---------- */
+
+.il-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 32px;
+  background: var(--am-surface);
+  border-radius: var(--am-radius-lg);
+  box-shadow: var(--am-shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+}
+.il-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #f59e0b);
+  opacity: 0.9;
+}
+
+.il-hero__left {
+  display: flex;
+  align-items: center;
   gap: 16px;
+  min-width: 0;
 }
 
-.incident-list-page *,
-.incident-list-page *::before,
-.incident-list-page *::after {
-  box-sizing: border-box;
+.il-hero__icon {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 10px 20px -8px rgba(99, 102, 241, 0.55);
 }
 
-/* ─── Toolbar ─────────────────────────────────────────────── */
-.incident-list-toolbar {
+.il-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--am-primary);
+  background: var(--am-primary-50);
+  padding: 5px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.il-hero__left h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  letter-spacing: -0.5px;
+  color: var(--am-ink-900);
+}
+.il-hero__left p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--am-ink-500);
+}
+
+.il-hero__right {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
 }
 
-.incident-list-search {
-  flex: 1 1 240px;
-  min-width: 200px;
-}
+/* ---------- Stat chips (card language from Login) ---------- */
 
-.incident-list-select {
-  -webkit-appearance: none;
-  appearance: none;
-  font-family: var(--font-ui);
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 9px 32px 9px 12px;
-  cursor: pointer;
-  min-height: 38px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa4b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 14px;
-  transition: border-color 0.15s ease, color 0.15s ease;
-}
-
-.incident-list-select:hover {
-  border-color: var(--border-strong);
-  color: var(--text-primary);
-}
-
-.incident-list-select:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
-.incident-list-select option {
-  background: var(--bg-elevated-2);
-  color: var(--text-primary);
-}
-
-.incident-list-clear {
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #ff8a97;
-  background: rgba(242, 73, 92, 0.08);
-  border: 1px solid rgba(242, 73, 92, 0.25);
-  border-radius: 9px;
-  padding: 9px 14px;
-  min-height: 38px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.incident-list-clear:hover {
-  background: rgba(242, 73, 92, 0.16);
-  border-color: rgba(242, 73, 92, 0.4);
-}
-
-.incident-list-count {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  white-space: nowrap;
-  padding-left: 8px;
-}
-
-/* ─── Table card wrapper ─────────────────────────────────── */
-.incident-list-table-card {
-  border-radius: 14px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
-
-/* ─── Cell renderers ──────────────────────────────────────── */
-.incident-list-link {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent);
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.incident-list-link:hover {
-  color: #86a8ff;
-  text-decoration: underline;
-}
-
-.incident-list-title {
-  color: var(--text-primary);
-  font-weight: 500;
-  font-size: 0.86rem;
-}
-
-.incident-list-muted {
-  color: var(--text-tertiary);
-  font-size: 0.85rem;
-}
-
-.incident-list-date {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-}
-
-/* ─── Error state ─────────────────────────────────────────── */
-.incident-list-error {
+.il-stat-chip {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 18px 20px;
-  border-radius: 14px;
-  background: rgba(242, 73, 92, 0.08);
-  border: 1px solid rgba(242, 73, 92, 0.25);
-  color: #ff8a97;
-  font-size: 0.88rem;
-  font-weight: 500;
+  padding: 10px 14px;
+  background: #fbfcff;
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-md);
+  min-width: 118px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.il-stat-chip:hover {
+  transform: translateY(-2px);
+  border-color: var(--am-line-strong);
+  box-shadow: var(--am-shadow-sm);
 }
 
-.incident-list-error svg {
-  width: 22px;
-  height: 22px;
+.il-stat-chip__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
   flex-shrink: 0;
 }
+.il-stat-chip__icon--primary {
+  background: var(--am-primary-50);
+  color: var(--am-primary);
+}
+.il-stat-chip__icon--amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--am-accent);
+}
+.il-stat-chip__icon--violet {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--am-violet);
+}
 
-/* ─── Responsive ──────────────────────────────────────────── */
+.il-stat-chip__value {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--am-ink-900);
+  line-height: 1.1;
+}
+.il-stat-chip__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--am-ink-500);
+  letter-spacing: 0.3px;
+}
+
+/* ---------- Toolbar (same card language as Login) ---------- */
+
+.il-toolbar {
+  padding: 22px 24px;
+  background: var(--am-surface);
+  border-radius: var(--am-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--am-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.il-toolbar__search {
+  position: relative;
+}
+
+/* Input shell matching .am-input from Login */
+.il-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--am-radius-md);
+  background: #fbfcff;
+  border: 1.5px solid var(--am-line);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.il-search:hover { border-color: var(--am-line-strong); }
+.il-search:focus-within {
+  border-color: var(--am-primary);
+  background: #fff;
+  box-shadow: var(--am-shadow-focus);
+}
+
+.il-search__icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--am-ink-500);
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 1;
+}
+.il-search__inner {
+  flex: 1;
+  min-width: 0;
+}
+.il-search__inner input,
+.il-search__inner > div,
+.il-search__inner > input {
+  padding: 14px 16px 14px 42px !important;
+  font-size: 14.5px;
+  border: 0 !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  width: 100%;
+  color: var(--am-ink-900);
+}
+.il-search__inner input::placeholder {
+  color: var(--am-ink-300);
+}
+
+/* Filter groups */
+.il-toolbar__filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.il-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.il-filter-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--am-ink-700);
+}
+
+.il-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.il-chip {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1.5px solid var(--am-line);
+  background: #fff;
+  color: var(--am-ink-700);
+  cursor: pointer;
+  font: inherit;
+  transition: all 0.2s ease;
+}
+.il-chip:hover {
+  border-color: var(--am-primary);
+  color: var(--am-primary);
+  transform: translateY(-1px);
+}
+.il-chip.is-active {
+  background: linear-gradient(135deg, var(--am-primary), #6366f1);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 8px 20px -8px rgba(79, 70, 229, 0.55);
+}
+
+/* Priority chips carry their own color */
+.il-chip--priority[data-priority="low"].is-active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 8px 20px -8px rgba(16, 185, 129, 0.55);
+}
+.il-chip--priority[data-priority="medium"].is-active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+}
+.il-chip--priority[data-priority="high"].is-active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 8px 20px -8px rgba(245, 158, 11, 0.55);
+}
+.il-chip--priority[data-priority="critical"].is-active {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 8px 20px -8px rgba(239, 68, 68, 0.55);
+}
+
+/* Clear filters (ghost button from Login) */
+.il-clear {
+  margin-left: auto;
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--am-radius-md);
+  border: 1.5px solid var(--am-line);
+  background: #fff;
+  color: var(--am-ink-700);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.il-clear:hover {
+  border-color: var(--am-danger);
+  color: var(--am-danger);
+  background: #fff5f5;
+}
+
+/* ---------- Table card (matches Login card) ---------- */
+
+.il-table-card {
+  background: var(--am-surface);
+  border-radius: var(--am-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--am-shadow-sm);
+  overflow: hidden;
+}
+
+.il-table-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--am-line);
+  background: #fbfcff;
+  flex-wrap: wrap;
+}
+.il-table-card__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--am-ink-900);
+}
+.il-table-card__title svg {
+  color: var(--am-primary);
+  font-size: 14px;
+}
+.il-table-card__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--am-ink-500);
+}
+.il-table-card__meta strong {
+  color: var(--am-ink-900);
+  font-weight: 600;
+}
+
+.il-table-card__body {
+  padding: 4px 4px 8px;
+}
+
+/* ---------- Table cell helpers ---------- */
+
+.il-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--am-primary);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--am-primary-50);
+  transition: all 0.2s ease;
+}
+.il-ref:hover {
+  background: rgba(79, 70, 229, 0.15);
+}
+.il-ref__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--am-primary);
+}
+.il-title {
+  font-weight: 500;
+  color: var(--am-ink-900);
+}
+.il-muted {
+  color: var(--am-ink-500);
+}
+.il-date {
+  font-size: 12.5px;
+  color: var(--am-ink-700);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Error state ---------- */
+
+.il-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  border-radius: var(--am-radius-lg);
+  background: #fff;
+  border: 1px solid var(--am-line);
+  box-shadow: var(--am-shadow-sm);
+  max-width: 620px;
+  margin: 60px auto 0;
+}
+.il-state--error {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.il-state__icon {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--am-danger);
+  font-size: 20px;
+}
+.il-state h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: #b91c1c;
+  font-weight: 600;
+}
+.il-state p {
+  margin: 0;
+  font-size: 13.5px;
+  color: #b91c1c;
+  opacity: 0.9;
+}
+
+/* ---------- Spinner (matches Login) ---------- */
+
+.il-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(79, 70, 229, 0.25);
+  border-top-color: var(--am-primary);
+  animation: il-spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes il-spin { to { transform: rotate(360deg); } }
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 920px) {
+  .il-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .il-hero__right { width: 100%; }
+  .il-stat-chip { flex: 1; min-width: 0; }
+}
+
 @media (max-width: 640px) {
-  .incident-list-toolbar {
+  .il-page { padding: 12px; }
+  .il-hero { padding: 20px; border-radius: 18px; }
+  .il-hero__left h1 { font-size: 22px; }
+  .il-hero__right { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .il-stat-chip { min-width: 130px; }
+  .il-toolbar { padding: 18px; border-radius: 18px; }
+  .il-toolbar__filters { flex-direction: column; align-items: stretch; gap: 16px; }
+  .il-clear { margin-left: 0; align-self: flex-start; }
+  .il-table-card { border-radius: 18px; }
+  .il-table-card__header { padding: 14px 18px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+/* =========================================================
+   Parent page override — light theme
+   Kills the dark background around the page header and
+   forces it to match Login.css.
+   ========================================================= */
+
+/* Kill any full-page dark background */
+body,
+#root,
+main,
+.app,
+.app-container,
+.layout,
+.layout-content,
+.page,
+.page-wrapper,
+.page-container,
+.incidents-page,
+.incidents-container,
+.incident-page,
+.incident-list-page,
+.list-page,
+.dashboard-content,
+.content-area {
+  background: linear-gradient(180deg, #f7f8fc 0%, #eef1f9 100%) !important;
+  background-color: #eef1f9 !important;
+  color: var(--am-ink-900) !important;
+}
+
+/* Header bar that holds "Track and manage reported incidents" + "New Incident" */
+.page-header,
+.page__header,
+.incidents-header,
+.incidents-page__header,
+.incident-header,
+.incident-list-header,
+.list-header,
+.header-bar,
+.content-header,
+.dashboard-header,
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 32px;
+  margin: 0 0 20px;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--am-ink-900) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 22px;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+.page-header::before,
+.page__header::before,
+.incidents-header::before,
+.incidents-page__header::before,
+.incident-header::before,
+.incident-list-header::before,
+.list-header::before,
+.header-bar::before,
+.content-header::before,
+.dashboard-header::before,
+.section-header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #f59e0b);
+  opacity: 0.9;
+}
+
+/* Any element inside that header that was dark */
+.page-header *,
+.page__header *,
+.incidents-header *,
+.incidents-page__header *,
+.incident-header *,
+.incident-list-header *,
+.list-header *,
+.header-bar *,
+.content-header *,
+.dashboard-header *,
+.section-header * {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: inherit;
+}
+
+/* Restore gradient on the primary CTA button */
+.page-header .btn-primary,
+.page-header .btn.btn-primary,
+.page-header button.btn-primary,
+.incidents-header .btn-primary,
+.incidents-page__header .btn-primary,
+.incident-header .btn-primary,
+.incident-list-header .btn-primary,
+.list-header .btn-primary,
+.header-bar .btn-primary,
+.content-header .btn-primary,
+.dashboard-header .btn-primary,
+.section-header .btn-primary {
+  background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border: 1.5px solid transparent !important;
+  box-shadow: 0 10px 24px -10px rgba(79, 70, 229, 0.7) !important;
+  border-radius: 14px;
+  padding: 11px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.page-header .btn-primary:hover,
+.incidents-header .btn-primary:hover,
+.incidents-page__header .btn-primary:hover,
+.incident-list-header .btn-primary:hover,
+.list-header .btn-primary:hover,
+.header-bar .btn-primary:hover,
+.content-header .btn-primary:hover,
+.dashboard-header .btn-primary:hover,
+.section-header .btn-primary:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 14px 30px -10px rgba(79, 70, 229, 0.85) !important;
+}
+
+/* Titles and subtitles */
+.page-header h1,
+.page-header h2,
+.page-header h3,
+.incidents-header h1,
+.incidents-header h2,
+.incidents-header h3,
+.incidents-page__header h1,
+.incidents-page__header h2,
+.incidents-page__header h3,
+.incident-header h1,
+.incident-header h2,
+.incident-list-header h1,
+.incident-list-header h2,
+.list-header h1,
+.list-header h2,
+.header-bar h1,
+.header-bar h2,
+.content-header h1,
+.content-header h2,
+.dashboard-header h1,
+.dashboard-header h2,
+.section-header h1,
+.section-header h2 {
+  color: #0f172a !important;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  margin: 0 0 4px;
+}
+
+.page-header p,
+.incidents-header p,
+.incidents-page__header p,
+.incident-header p,
+.incident-list-header p,
+.list-header p,
+.header-bar p,
+.content-header p,
+.dashboard-header p,
+.section-header p {
+  color: #64748b !important;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Catch any element that still has a dark inline style or utility class */
+[class*="bg-gray-9"],
+[class*="bg-slate-9"],
+[class*="bg-zinc-9"],
+[class*="bg-neutral-9"],
+[class*="bg-black"],
+[class*="bg-dark"],
+[class*="bg-[#0"],
+[class*="bg-[#1"] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .page-header,
+  .incidents-header,
+  .incidents-page__header,
+  .incident-header,
+  .incident-list-header,
+  .list-header,
+  .header-bar,
+  .content-header,
+  .dashboard-header,
+  .section-header {
     flex-direction: column;
     align-items: stretch;
+    padding: 18px;
+    border-radius: 18px;
   }
-
-  .incident-list-count {
-    margin-left: 0;
-    padding-left: 0;
+  .page-header .btn-primary,
+  .incidents-header .btn-primary,
+  .incidents-page__header .btn-primary,
+  .incident-list-header .btn-primary,
+  .list-header .btn-primary {
+    width: 100%;
+    justify-content: center;
   }
 }

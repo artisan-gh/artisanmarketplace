@@ -75,6 +75,20 @@ import { Contact } from './pages/Contact';
 import { HelpCenter } from './pages/HelpCenter';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
+
+import TestCentre from './components/provider/TestCentre';
+import TestRunner from './components/provider/TestRunner';
+import TestResult from './components/provider/TestResult';
+import MyDetails from './components/provider/MyDetails';
+import PhoneEntryScreen from './screens/auth/PhoneEntryScreen';
+import OtpVerifyScreen from './screens/auth/OtpVerifyScreen';
+import ClientPublicInvoicePage from './screens/client/PublicInvoicePage';
+import InvoicesListScreen from './screens/client/InvoicesListScreen';
+import InvoiceDetailScreen from './screens/client/InvoiceDetailScreen';
+import NewRequestScreen from './screens/client/NewRequestScreen';
+import RequestsListScreen from './screens/client/RequestsListScreen';
+import RequestDetailScreen from './screens/client/RequestDetailScreen';
+import WalletScreen from './screens/client/WalletScreen';
 function App() {
   return (
     <AuthProvider>
@@ -119,6 +133,10 @@ function App() {
           {/* ─── Artisans ─────────────────────────────────────── */}
           <Route path="/artisans" element={<PrivateRoute><ArtisansPage /></PrivateRoute>} />
           <Route path="/artisans/:id" element={<PrivateRoute><ArtisanProfilePage /></PrivateRoute>} />
+          <Route path="/provider/test-centre" element={<TestCentre />} />
+          <Route path="/provider/test-centre/:slug/run" element={<TestRunner />} />
+          <Route path="/provider/test-centre/result/:id" element={<TestResult />} />
+          <Route path="/artisan/profile"element={<PrivateRoute><MyDetails /></PrivateRoute>}/>
 
           {/* ─── Assignments ──────────────────────────────────── */}
           <Route path="/assignments" element={<PrivateRoute><AssignmentsPage /></PrivateRoute>} />
@@ -133,6 +151,7 @@ function App() {
           <Route path="/call-center/logs" element={<PrivateRoute><CallLogsPage /></PrivateRoute>} />
           <Route path="/call-center/logs/new" element={<PrivateRoute><CallLogNewPage /></PrivateRoute>} />
           <Route path="/call-center/logs/:id" element={<PrivateRoute><CallLogDetailPage /></PrivateRoute>} />
+          
 
           {/* ─── Reports ──────────────────────────────────────── */}
           <Route path="/reports/incidents" element={<PrivateRoute><IncidentReportPage /></PrivateRoute>} />
@@ -164,6 +183,20 @@ function App() {
           // Inside your route configuration:
           <Route path="/billing/invoices/public/:token" element={<PublicInvoicePage />} />
 
+
+          
+          <Route path="/login-phone" element={<PhoneEntryScreen />} />
+          <Route path="/login-otp" element={<OtpVerifyScreen />} />
+
+          
+          {/* ─── Client (self-service) ─────────────────────── */}
+          <Route path="/client/invoices" element={<InvoicesListScreen />} />
+          <Route path="/client/invoices/:id" element={<InvoiceDetailScreen />} />
+          <Route path="/client/requests/new" element={<NewRequestScreen />} />
+          <Route path="/pay/:token" element={<ClientPublicInvoicePage />} />
+          <Route path="/client/requests" element={<RequestsListScreen />} />
+          <Route path="/client/wallet" element={<WalletScreen />} />
+          <Route path="/client/requests/:id" element={<RequestDetailScreen />} />
 
           {/* ─── Catch-all ────────────────────────────────────── */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

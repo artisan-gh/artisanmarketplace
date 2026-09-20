@@ -1,19 +1,24 @@
 // src/components/dashboard/DispatchDashboard.jsx
+
 import { useEffect, useReducer, useRef, useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
+
+
 import { useWebSocket } from '../../hooks/useWebSocket';
-import { getIncidents } from '../../api/incidentsAPI';
+import { getIncidents, assignIncident } from '../../api/incidentsAPI';
 import { getAvailableArtisans } from '../../api/artisansAPI';
-import { assignIncident } from '../../api/incidentsAPI';
-import { getAssignments } from '../../api/assignmentsAPI';
+import { getAssignments, rateAssignment } from '../../api/assignmentsAPI';
 import { getCurrentUser } from '../../api/authAPI';
-import { rateAssignment } from '../../api/assignmentsAPI';
 import { useAuth } from '../../context/AuthContext';
 import { StatusBadge } from '../common/StatusBadge';
+
 import './DispatchDashboard.css';
 
-// ─── Icons ──────────────────────────────────────────────────
+
+// ============================================================
+// ICONS
+// ============================================================
 const IconClipboard = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
     <rect x="6" y="4" width="12" height="17" rx="2" />
@@ -21,7 +26,6 @@ const IconClipboard = (props) => (
     <path d="M9 11h6M9 15h6" />
   </svg>
 );
-
 const IconUsers = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -30,52 +34,44 @@ const IconUsers = (props) => (
     <path d="M16 3.13a4 4 0 010 7.75" />
   </svg>
 );
-
 const IconCheckCircle = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
     <circle cx="12" cy="12" r="9" />
     <path d="M8.5 12.5l2.5 2.5 5-5" />
   </svg>
 );
-
 const IconClock = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
     <circle cx="12" cy="12" r="9" />
     <path d="M12 7v5l3.5 2" />
   </svg>
 );
-
 const IconStar = (props) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
     <path d="M12 2.5l2.9 6.2 6.6.6-5 4.5 1.5 6.6L12 17l-5.9 3.4L7.6 13.8l-5-4.5 6.6-.6L12 2.5z" />
   </svg>
 );
-
 const IconStarOutline = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
     <path d="M12 2.5l2.9 6.2 6.6.6-5 4.5 1.5 6.6L12 17l-5.9 3.4L7.6 13.8l-5-4.5 6.6-.6L12 2.5z" />
   </svg>
 );
-
 const IconWrench = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
     <path d="M14.7 6.3a4 4 0 10-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 005.4-5.4l-2.8 2.8-2-2 2.8-2.8z" />
   </svg>
 );
-
 const IconBriefcase = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
     <rect x="3" y="7" width="18" height="13" rx="2" />
     <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
   </svg>
 );
-
 const IconArrowRight = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
     <path d="M5 12h14M13 6l6 6-6 6" />
   </svg>
 );
-
 const IconLogout = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
     <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
@@ -83,11 +79,20 @@ const IconLogout = (props) => (
     <path d="M21 12H9" />
   </svg>
 );
+const IconRefresh = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
+    <path d="M20 11a8.1 8.1 0 00-15.5-2M4 5v4h4" />
+    <path d="M4 13a8.1 8.1 0 0015.5 2M20 19v-4h-4" />
+  </svg>
+);
 
-// ─── Stat Card ──────────────────────────────────────────────
+
+// ============================================================
+// STAT CARD
+// ============================================================
 const StatCard = ({ icon: Icon, color, value, label }) => (
-  <div className="stat-card">
-    <div className="stat-card__icon-wrap" style={{ '--stat-color': color }}>
+  <div className="stat-card" style={{ '--stat-color': color }}>
+    <div className="stat-card__icon-wrap">
       <Icon className="stat-card__icon" />
     </div>
     <div className="stat-card__body">
@@ -97,21 +102,26 @@ const StatCard = ({ icon: Icon, color, value, label }) => (
   </div>
 );
 
-// ─── Priority → accent color ──────────────────────────────
+
+// ============================================================
+// PRIORITY
+// ============================================================
 const PRIORITY_COLORS = {
   low: '#64748b',
   medium: '#3b82f6',
   high: '#f59e0b',
-  critical: '#f87171',
-  urgent: '#f87171',
+  critical: '#ef4444',
+  urgent: '#ef4444',
 };
 const getPriorityColor = (priority) =>
   PRIORITY_COLORS[(priority || '').toLowerCase()] || '#64748b';
 
-// ─── ⭐ Rating Stars Component ─────────────────────────────
+
+// ============================================================
+// RATING STARS
+// ============================================================
 const RatingStars = ({ value, onChange, disabled, size = 20 }) => {
   const [hover, setHover] = useState(0);
-
   return (
     <div className="rating-stars" style={{ display: 'inline-flex', gap: '2px' }}>
       {[1, 2, 3, 4, 5].map((star) => (
@@ -144,7 +154,10 @@ const RatingStars = ({ value, onChange, disabled, size = 20 }) => {
   );
 };
 
-// ─── Reducer ──────────────────────────────────────────────────
+
+// ============================================================
+// REDUCER
+// ============================================================
 const initialState = {
   pendingIncidents: [],
   activeAssignments: [],
@@ -172,25 +185,20 @@ function dashboardReducer(state, action) {
         pendingIncidents: state.pendingIncidents.filter((inc) => inc.id !== action.payload),
       };
     case 'ADD_ASSIGNMENT':
-      return {
-        ...state,
-        activeAssignments: [action.payload, ...state.activeAssignments],
-      };
+      return { ...state, activeAssignments: [action.payload, ...state.activeAssignments] };
     case 'ADD_ALERT':
-      return {
-        ...state,
-        incomingAlerts: [action.payload, ...state.incomingAlerts],
-      };
+      return { ...state, incomingAlerts: [action.payload, ...state.incomingAlerts] };
     case 'REMOVE_ALERT':
-      return {
-        ...state,
-        incomingAlerts: state.incomingAlerts.slice(1),
-      };
+      return { ...state, incomingAlerts: state.incomingAlerts.slice(1) };
     default:
       return state;
   }
 }
 
+
+// ============================================================
+// MAIN
+// ============================================================
 export const DispatchDashboard = () => {
   const queryClient = useQueryClient();
   const { messages } = useWebSocket();
@@ -200,56 +208,47 @@ export const DispatchDashboard = () => {
   const { pendingIncidents, activeAssignments, incomingAlerts } = state;
   const alertTimeoutRef = useRef(null);
 
-  // ─── Local state for ratings ──────────────────────────────
   const [ratings, setRatings] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedSubcategory, setSelectedSubcategory] = useState('All');
 
-  // ─── Fetch current user ──────────────────────────────────────
+  // ─── Queries ─────────────────────────────────────────────
   const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ['currentUser'],
     queryFn: getCurrentUser,
     staleTime: 5 * 60 * 1000,
   });
 
-  // ─── Fetch ALL incidents ────────────────────────────────────
   const { data: incidentsData, isLoading: incidentsLoading } = useQuery({
     queryKey: ['dispatchIncidents'],
-    queryFn: () =>
-      getIncidents({ page_size: 100 }).then((res) => res.results || []),
+    queryFn: () => getIncidents({ page_size: 100 }).then((res) => res.results || []),
     staleTime: 5 * 60 * 1000,
   });
 
-  // ─── Fetch available artisans ──────────────────────────────
   const { data: artisansData, isLoading: artisansLoading } = useQuery({
     queryKey: ['availableArtisans'],
     queryFn: () =>
-      getAvailableArtisans().then((res) =>
-        Array.isArray(res) ? res : res.results || []
-      ),
+      getAvailableArtisans().then((res) => (Array.isArray(res) ? res : res.results || [])),
     staleTime: 2 * 60 * 1000,
   });
 
-  // ─── Fetch active assignments (filter: exclude completed/cancelled) ──
   const { data: assignmentsData, isLoading: assignmentsLoading } = useQuery({
     queryKey: ['activeAssignments'],
     queryFn: () =>
       getAssignments().then((res) => {
         const responseData = res.data || res;
         const items = responseData.results || responseData || [];
-        // Consider any status that is NOT 'completed', 'cancelled', or 'closed' as active
-        const active = items.filter(
+        return items.filter(
           (a) =>
             a.status?.toLowerCase() !== 'completed' &&
             a.status?.toLowerCase() !== 'cancelled' &&
             a.status?.toLowerCase() !== 'closed'
         );
-        return active;
       }),
     staleTime: 2 * 60 * 1000,
   });
 
-  // ─── Assign mutation ────────────────────────────────────────
+  // ─── Mutations ───────────────────────────────────────────
   const assignMutation = useMutation({
     mutationFn: ({ incidentId, artisanId }) =>
       assignIncident(incidentId, { assigned_to: artisanId }),
@@ -260,44 +259,38 @@ export const DispatchDashboard = () => {
     },
   });
 
-  // ─── Rating mutation ────────────────────────────────────────
   const rateMutation = useMutation({
-    mutationFn: ({ assignmentId, rating }) =>
-      rateAssignment(assignmentId, { rating }),
+    mutationFn: ({ assignmentId, rating }) => rateAssignment(assignmentId, { rating }),
     onSuccess: (data, variables) => {
-      setRatings((prev) => ({
-        ...prev,
-        [variables.assignmentId]: variables.rating,
-      }));
+      setRatings((prev) => ({ ...prev, [variables.assignmentId]: variables.rating }));
       queryClient.invalidateQueries({ queryKey: ['availableArtisans'] });
     },
-    onError: (error) => {
-      console.error('Rating failed:', error);
-    },
+    onError: (error) => console.error('Rating failed:', error),
   });
 
-  // ─── Update local state: keep only NEW, OPEN, ASSIGNED ────
+  // ─── Sync incidents ──────────────────────────────────────
   useEffect(() => {
     if (incidentsData) {
       const statuses = ['NEW', 'OPEN', 'ASSIGNED'];
-      const pending = incidentsData.filter(
-        (inc) => statuses.includes(inc.status_name || inc.status_display || inc.status)
+      const pending = incidentsData.filter((inc) =>
+        statuses.includes(inc.status_name || inc.status_display || inc.status)
       );
       dispatch({ type: 'SET_PENDING_INCIDENTS', payload: pending });
     }
   }, [incidentsData]);
 
-  // ─── Update active assignments from fetched data ──────────
+  // ─── Sync assignments ────────────────────────────────────
   useEffect(() => {
     if (assignmentsData) {
       dispatch({ type: 'SET_ACTIVE_ASSIGNMENTS', payload: assignmentsData });
     }
   }, [assignmentsData]);
 
-  // ─── Handle WebSocket messages ─────────────────────────────
+  // ─── WebSocket ───────────────────────────────────────────
   useEffect(() => {
     if (!messages.length) return;
     const latest = messages[messages.length - 1];
+
     if (latest.type === 'incident_update') {
       const { action, data } = latest.data;
       if (action === 'created') {
@@ -314,13 +307,13 @@ export const DispatchDashboard = () => {
         alertTimeoutRef.current = setTimeout(() => {
           dispatch({ type: 'REMOVE_ALERT' });
         }, 5000);
-      } else if (action === 'updated') {
-        dispatch({
-          type: 'UPDATE_INCIDENT',
-          payload: { id: data.incident_id, data },
-        });
       }
-    } else if (latest.type === 'assignment_update') {
+      if (action === 'updated') {
+        dispatch({ type: 'UPDATE_INCIDENT', payload: { id: data.incident_id, data } });
+      }
+    }
+
+    if (latest.type === 'assignment_update') {
       const { action, data } = latest.data;
       if (action === 'assigned') {
         dispatch({ type: 'ADD_ASSIGNMENT', payload: data });
@@ -329,30 +322,24 @@ export const DispatchDashboard = () => {
     }
   }, [messages]);
 
-  // ─── Cleanup timeouts ──────────────────────────────────────
   useEffect(() => {
     return () => {
       if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
     };
   }, []);
 
-  // ─── Handle logout ──────────────────────────────────────────
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  // ─── Memoize availableArtisans to stabilize reference ──────
-  const availableArtisans = useMemo(() => {
-    return artisansData || [];
-  }, [artisansData]);
+  // ─── Memos ───────────────────────────────────────────────
+  const availableArtisans = useMemo(() => artisansData || [], [artisansData]);
 
-  // ─── Category filter logic ─────────────────────────────────
   const categories = useMemo(() => {
     const cats = new Set();
     availableArtisans.forEach((artisan) => {
-      const catName = artisan.category_detail?.name || 'Uncategorized';
-      cats.add(catName);
+      cats.add(artisan.category_detail?.name || 'Uncategorized');
     });
     return ['All', ...Array.from(cats).sort()];
   }, [availableArtisans]);
@@ -388,7 +375,7 @@ export const DispatchDashboard = () => {
     ).length;
   };
 
-  // ─── Loading state ─────────────────────────────────────────
+  // ─── Loading ─────────────────────────────────────────────
   if (incidentsLoading || artisansLoading || userLoading || assignmentsLoading) {
     return (
       <div className="dispatch-dashboard">
@@ -398,7 +385,8 @@ export const DispatchDashboard = () => {
             <div key={i} className="stat-skeleton" />
           ))}
         </div>
-        <div className="dispatch-grid">
+        <div className="kanban">
+          <div className="panel-skeleton" />
           <div className="panel-skeleton" />
           <div className="panel-skeleton" />
         </div>
@@ -406,41 +394,53 @@ export const DispatchDashboard = () => {
     );
   }
 
-  // ─── After loading, compute user data ─────────────────────
+  // ─── User ────────────────────────────────────────────────
   const user = userData || {};
   const avatarUrl = user.profile_picture || null;
   const fullName = user.full_name || user.name || 'Dispatcher';
   const role = user.role || user.user_type_display || 'Dispatcher';
 
-  const awaitingDispatch = incidentsData?.filter(
-    (i) => (i.status_name || i.status_display || i.status) === 'NEW'
-  ).length || 0;
+  const awaitingDispatch =
+    incidentsData?.filter(
+      (i) => (i.status_name || i.status_display || i.status) === 'NEW'
+    ).length || 0;
 
-  // ─── Handle rating submission ──────────────────────────────
   const handleRate = (assignmentId, rating) => {
     if (ratings[assignmentId]) return;
     rateMutation.mutate({ assignmentId, rating });
   };
 
-  // ─── Handle category change – reset subcategory ───────────
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
     setSelectedSubcategory('All');
   };
 
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['dispatchIncidents'] });
+    queryClient.invalidateQueries({ queryKey: ['availableArtisans'] });
+    queryClient.invalidateQueries({ queryKey: ['activeAssignments'] });
+    queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+  };
+
+  // ─── Render ──────────────────────────────────────────────
   return (
     <div className="dispatch-dashboard">
-      {/* ─── Header ───────────────────────────────────────────── */}
+
+      {/* ─── Header ──────────────────────────────────────── */}
       <header className="dispatch-header">
         <div className="agent-profile">
           <div className="agent-profile__avatar">
             {avatarUrl ? (
               <img src={avatarUrl} alt={fullName} />
             ) : (
-              <div className="agent-profile__initial">{fullName.charAt(0).toUpperCase()}</div>
+              <div className="agent-profile__initial">
+                {fullName.charAt(0).toUpperCase()}
+              </div>
             )}
           </div>
+
           <div className="agent-profile__info">
+            <span className="agent-profile__welcome">Welcome back</span>
             <h2 className="agent-profile__name">{fullName}</h2>
             <div className="agent-profile__meta">
               <span className="agent-profile__role">{role}</span>
@@ -455,23 +455,39 @@ export const DispatchDashboard = () => {
         </div>
 
         <div className="dispatch-header__right">
-          <h1 className="dispatch-title">Dispatch Console</h1>
-          <span className="live-indicator">
-            <span className="live-indicator__dot" aria-hidden="true" />
-            Live
-          </span>
-          <button
-            className="logout-btn"
-            onClick={handleLogout}
-            aria-label="Logout"
-            title="Logout"
-          >
-            <IconLogout className="logout-btn__icon" width={20} height={20} />
-          </button>
+          <div className="dispatch-header__title-group">
+            <h1 className="dispatch-title">Dispatch Console</h1>
+            <p className="dispatch-subtitle">Monitor incidents and coordinate artisans</p>
+          </div>
+
+          <div className="dispatch-header__actions">
+            <span className="live-indicator">
+              <span className="live-indicator__dot" aria-hidden="true" />
+              Live
+            </span>
+
+            <button
+              className="header-action-btn"
+              onClick={handleRefresh}
+              title="Refresh dashboard"
+              aria-label="Refresh dashboard"
+            >
+              <IconRefresh width={18} height={18} />
+            </button>
+
+            <button
+              className="logout-btn"
+              onClick={handleLogout}
+              aria-label="Logout"
+              title="Logout"
+            >
+              <IconLogout className="logout-btn__icon" width={19} height={19} />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* ─── Incoming Alerts ──────────────────────────────────── */}
+      {/* ─── Alerts ──────────────────────────────────────── */}
       {incomingAlerts.length > 0 && (
         <div className="alert-stack" role="status" aria-live="polite">
           {incomingAlerts.map((alert) => (
@@ -483,8 +499,8 @@ export const DispatchDashboard = () => {
         </div>
       )}
 
-      {/* ─── Stat Cards ──────────────────────────────────────── */}
-      <div className="stat-grid">
+      {/* ─── KPI strip (single horizontal row) ───────────── */}
+      <section className="kpi-strip">
         <StatCard
           icon={IconClipboard}
           color="#f59e0b"
@@ -505,49 +521,60 @@ export const DispatchDashboard = () => {
         />
         <StatCard
           icon={IconClock}
-          color="#f87171"
+          color="#ef4444"
           value={awaitingDispatch}
           label="Awaiting dispatch"
         />
-      </div>
+      </section>
 
-      {/* ─── Main Grid ────────────────────────────────────────── */}
-      <div className="dispatch-grid">
-        {/* ─── Pending Incidents ──────────────────────────────── */}
-        <section className="panel">
-          <div className="panel__header">
-            <h3 className="panel__title">Pending Incidents</h3>
-            <span className="panel__count">{pendingIncidents.length}</span>
-          </div>
+      {/* ─── Kanban workspace (3 horizontal columns) ────── */}
+      <div className="kanban">
 
-          {pendingIncidents.length === 0 ? (
-            <div className="empty-state">
-              <IconCheckCircle className="empty-state__icon" />
-              <p>Nothing waiting. New reports will appear here the moment they come in.</p>
+        {/* ─── Column 1: Pending incidents ──────────────── */}
+        <section className="kanban__col kanban__col--incidents">
+          <header className="kanban__head">
+            <div className="kanban__head-left">
+              <span className="kanban__dot kanban__dot--orange" />
+              <h3>Pending Incidents</h3>
             </div>
-          ) : (
-            <ul className="incident-list">
-              {pendingIncidents.map((incident) => (
-                <li
+            <span className="kanban__count kanban__count--orange">
+              {pendingIncidents.length}
+            </span>
+          </header>
+
+          <div className="kanban__scroll">
+            {pendingIncidents.length === 0 ? (
+              <div className="kanban__empty">
+                <IconCheckCircle className="kanban__empty-icon" />
+                <p>All caught up</p>
+                <span>New reports appear here automatically.</span>
+              </div>
+            ) : (
+              pendingIncidents.map((incident) => (
+                <article
                   key={incident.id}
-                  className="incident-row"
+                  className="ticket ticket--incident"
                   style={{ '--priority-color': getPriorityColor(incident.priority) }}
                 >
-                  <div className="incident-row__main">
-                    <Link to={`/incidents/${incident.id}`} className="incident-row__id">
+                  <div className="ticket__top">
+                    <Link to={`/incidents/${incident.id}`} className="ticket__ref">
                       {incident.incident_number}
                     </Link>
-                    <p className="incident-row__title">{incident.title}</p>
-                    <div className="incident-row__badges">
-                      <StatusBadge status={incident.status?.toLowerCase()}>
-                        {incident.status}
-                      </StatusBadge>
-                      <StatusBadge status={incident.priority?.toLowerCase()}>
-                        {incident.priority}
-                      </StatusBadge>
-                    </div>
+                    <span className="ticket__priority">{incident.priority}</span>
                   </div>
-                  <div className="incident-row__actions">
+
+                  <p className="ticket__title">{incident.title}</p>
+
+                  <div className="ticket__badges">
+                    <StatusBadge status={incident.status?.toLowerCase()}>
+                      {incident.status}
+                    </StatusBadge>
+                    <StatusBadge status={incident.priority?.toLowerCase()}>
+                      {incident.priority}
+                    </StatusBadge>
+                  </div>
+
+                  <div className="ticket__actions">
                     <select
                       className="assign-select"
                       aria-label={`Assign an artisan to ${incident.incident_number}`}
@@ -568,28 +595,36 @@ export const DispatchDashboard = () => {
                         </option>
                       ))}
                     </select>
-                    <Link to={`/assignments/new/${incident.id}`} className="advanced-link">
-                      Advanced <IconArrowRight className="advanced-link__icon" />
+
+                    <Link
+                      to={`/assignments/new/${incident.id}`}
+                      className="advanced-link"
+                    >
+                      Advanced
+                      <IconArrowRight className="advanced-link__icon" />
                     </Link>
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                </article>
+              ))
+            )}
+          </div>
         </section>
 
-        {/* ─── Available Artisans (with category + subcategory filters) ─── */}
-        <section className="panel">
-          <div className="panel__header">
-            <h3 className="panel__title">Available Artisans</h3>
-            <span className="panel__count">{filteredArtisans.length}</span>
-          </div>
+        {/* ─── Column 2: Available artisans ─────────────── */}
+        <section className="kanban__col kanban__col--artisans">
+          <header className="kanban__head">
+            <div className="kanban__head-left">
+              <span className="kanban__dot kanban__dot--blue" />
+              <h3>Available Artisans</h3>
+            </div>
+            <span className="kanban__count kanban__count--blue">
+              {filteredArtisans.length}
+            </span>
+          </header>
 
-          <div className="panel__filter">
+          <div className="kanban__filters">
             <div className="filter-group">
-              <label htmlFor="category-filter" className="filter-label">
-                Category:
-              </label>
+              <label htmlFor="category-filter" className="filter-label">Category</label>
               <select
                 id="category-filter"
                 value={selectedCategory}
@@ -606,9 +641,7 @@ export const DispatchDashboard = () => {
 
             {subcategories.length > 1 && (
               <div className="filter-group">
-                <label htmlFor="subcategory-filter" className="filter-label">
-                  Skill:
-                </label>
+                <label htmlFor="subcategory-filter" className="filter-label">Skill</label>
                 <select
                   id="subcategory-filter"
                   value={selectedSubcategory}
@@ -616,126 +649,135 @@ export const DispatchDashboard = () => {
                   className="filter-select"
                 >
                   {subcategories.map((skill) => (
-                    <option key={skill} value={skill}>
-                      {skill}
-                    </option>
+                    <option key={skill} value={skill}>{skill}</option>
                   ))}
                 </select>
               </div>
             )}
           </div>
 
-          {filteredArtisans.length === 0 ? (
-            <div className="empty-state">
-              <IconUsers className="empty-state__icon" />
-              <p>No artisans match the current filters.</p>
-            </div>
-          ) : (
-            <ul className="artisan-list">
-              {filteredArtisans.map((artisan) => {
+          <div className="kanban__scroll">
+            {filteredArtisans.length === 0 ? (
+              <div className="kanban__empty">
+                <IconUsers className="kanban__empty-icon" />
+                <p>No artisans found</p>
+                <span>Try a different filter.</span>
+              </div>
+            ) : (
+              filteredArtisans.map((artisan) => {
                 const name = artisan.user_detail?.full_name || artisan.user;
                 return (
-                  <li key={artisan.id} className="artisan-row">
-                    <div className="artisan-row__avatar">
-                      {String(name).charAt(0).toUpperCase()}
-                    </div>
-                    <div className="artisan-row__body">
-                      <p className="artisan-row__name">{name}</p>
-                      <p className="artisan-row__category">
-                        {artisan.category_detail?.name || 'Uncategorized'}
-                        {artisan.skills_detail?.length > 0 && (
-                          <span className="artisan-row__skills">
-                            {' '}· {artisan.skills_detail.map((s) => s.name).join(', ')}
-                          </span>
-                        )}
-                      </p>
-                      <div className="artisan-row__meta">
-                        <span className="meta-chip">
-                          <IconWrench className="meta-chip__icon" />
-                          {artisan.skills_detail?.length || 0} skills
-                        </span>
-                        <span className="meta-chip">
-                          <IconBriefcase className="meta-chip__icon" />
-                          {artisan.current_workload || 0} active
-                        </span>
-                        {artisan.average_rating > 0 && (
-                          <span className="meta-chip meta-chip--rating">
-                            <IconStar className="meta-chip__icon" />
-                            {artisan.average_rating}
-                          </span>
-                        )}
+                  <article key={artisan.id} className="ticket ticket--artisan">
+                    <div className="ticket__artisan-top">
+                      <div className="ticket__avatar">
+                        {String(name).charAt(0).toUpperCase()}
                       </div>
+                      <div className="ticket__artisan-info">
+                        <p className="ticket__artisan-name">{name}</p>
+                        <p className="ticket__artisan-cat">
+                          {artisan.category_detail?.name || 'Uncategorized'}
+                        </p>
+                      </div>
+                      <StatusBadge status="success">Available</StatusBadge>
                     </div>
-                    <StatusBadge status="success">Available</StatusBadge>
-                  </li>
+
+                    <div className="ticket__meta">
+                      <span className="meta-chip">
+                        <IconWrench className="meta-chip__icon" />
+                        {artisan.skills_detail?.length || 0} skills
+                      </span>
+                      <span className="meta-chip">
+                        <IconBriefcase className="meta-chip__icon" />
+                        {artisan.current_workload || 0} active
+                      </span>
+                      {artisan.average_rating > 0 && (
+                        <span className="meta-chip meta-chip--rating">
+                          <IconStar className="meta-chip__icon" />
+                          {artisan.average_rating}
+                        </span>
+                      )}
+                    </div>
+                  </article>
                 );
-              })}
-            </ul>
-          )}
+              })
+            )}
+          </div>
+        </section>
+
+        {/* ─── Column 3: Active assignments ─────────────── */}
+        <section className="kanban__col kanban__col--assignments">
+          <header className="kanban__head">
+            <div className="kanban__head-left">
+              <span className="kanban__dot kanban__dot--green" />
+              <h3>Active Assignments</h3>
+            </div>
+            <span className="kanban__count kanban__count--green">
+              {activeAssignments.length}
+            </span>
+          </header>
+
+          <div className="kanban__scroll">
+            {activeAssignments.length === 0 ? (
+              <div className="kanban__empty">
+                <IconClipboard className="kanban__empty-icon" />
+                <p>No active assignments</p>
+                <span>Assign an incident to start tracking.</span>
+              </div>
+            ) : (
+              activeAssignments.map((assignment) => {
+                const isRated = !!ratings[assignment.id];
+                const currentRating = ratings[assignment.id] || 0;
+                const isSaving =
+                  rateMutation.isLoading &&
+                  rateMutation.variables?.assignmentId === assignment.id;
+
+                return (
+                  <article key={assignment.id} className="ticket ticket--assignment">
+                    <div className="ticket__route">
+                      <Link
+                        to={`/incidents/${assignment.incident_id}`}
+                        className="ticket__ref"
+                      >
+                        {assignment.incident_number}
+                      </Link>
+                      <IconArrowRight className="ticket__route-arrow" />
+                      <span className="ticket__artisan-name">
+                        {assignment.artisan_name || assignment.artisan}
+                      </span>
+                    </div>
+
+                    <div className="ticket__rating">
+                      <span className="ticket__rating-label">
+                        {isRated ? 'Performance' : 'Rate performance'}
+                      </span>
+                      <RatingStars
+                        value={currentRating}
+                        onChange={(rating) => handleRate(assignment.id, rating)}
+                        disabled={isRated || isSaving}
+                        size={16}
+                      />
+                      {isRated && (
+                        <span className="ticket__rated-check">✓</span>
+                      )}
+                      {isSaving && (
+                        <span className="ticket__saving">saving…</span>
+                      )}
+                    </div>
+
+                    <div className="ticket__footer">
+                      <StatusBadge
+                        status={assignment.status?.toLowerCase() || 'assigned'}
+                      >
+                        {assignment.status || 'Assigned'}
+                      </StatusBadge>
+                    </div>
+                  </article>
+                );
+              })
+            )}
+          </div>
         </section>
       </div>
-
-      {/* ─── Active Assignments (with rating) ────────────────── */}
-      <section className="panel panel--wide">
-        <div className="panel__header">
-          <h3 className="panel__title">Active Assignments</h3>
-          <span className="panel__count">{activeAssignments.length}</span>
-        </div>
-
-        {activeAssignments.length === 0 ? (
-          <div className="empty-state">
-            <IconClipboard className="empty-state__icon" />
-            <p>No assignments in progress. Assign an incident above to start one.</p>
-          </div>
-        ) : (
-          <ul className="assignment-list">
-            {activeAssignments.map((assignment) => {
-              const isRated = !!ratings[assignment.id];
-              const currentRating = ratings[assignment.id] || 0;
-
-              return (
-                <li key={assignment.id} className="assignment-row">
-                  <div className="assignment-row__route">
-                    <Link to={`/incidents/${assignment.incident_id}`} className="assignment-row__incident">
-                      {assignment.incident_number}
-                    </Link>
-                    <IconArrowRight className="assignment-row__arrow" />
-                    <span className="assignment-row__artisan">
-                      {assignment.artisan_name || assignment.artisan}
-                    </span>
-                  </div>
-
-                  <div className="assignment-row__rating">
-                    <span className="assignment-row__rating-label">
-                      {isRated ? 'Performance:' : 'Rate performance:'}
-                    </span>
-                    <RatingStars
-                      value={currentRating}
-                      onChange={(rating) => handleRate(assignment.id, rating)}
-                      disabled={isRated || rateMutation.isLoading}
-                      size={18}
-                    />
-                    {isRated && (
-                      <span className="assignment-row__rated-check" style={{ color: '#22c55e', marginLeft: '0.5rem' }}>
-                        ✓
-                      </span>
-                    )}
-                    {rateMutation.isLoading && rateMutation.variables?.assignmentId === assignment.id && (
-                      <span className="assignment-row__saving" style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#6b7280' }}>
-                        saving…
-                      </span>
-                    )}
-                  </div>
-
-                  <StatusBadge status={assignment.status?.toLowerCase() || 'assigned'}>
-                    {assignment.status || 'Assigned'}
-                  </StatusBadge>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
     </div>
   );
 };

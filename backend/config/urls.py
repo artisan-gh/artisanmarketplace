@@ -96,7 +96,11 @@ urlpatterns = [
     path("swagger.json/", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     
     path('api/public/categories/', PublicIncidentCategoryListView.as_view(), name='public-categories'),
-    path('api/public/subcategories/', PublicSubCategoryListView.as_view(), name='public-subcategories'),
+    path('api/public/subcategories/', PublicSubCategoryListView.as_view(), name='public-subcategories'),    path("api/provider/", include("provider.urls", namespace="provider")),
+    path("api/auth/", include("accounts.client_urls", namespace="client_auth")),
+    path("api/client/invoices/", include("billing.urls_client", namespace="billing_client")),
+    path("api/client/incidents/", include("incidents.urls_client", namespace="incidents_client")),
+
 ]
 
 # =============================================================================

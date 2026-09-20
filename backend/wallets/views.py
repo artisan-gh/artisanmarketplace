@@ -186,9 +186,9 @@ class WalletViewSet(viewsets.ModelViewSet):
             balance_after=wallet.balance,  # not yet deducted
             status=WalletTransaction.TransactionStatus.PENDING,
             metadata={
-                'requested_by': request.user.id,
-                'admin_approved': False
-            }
+            'requested_by': str(request.user.id),
+            'admin_approved': False
+        }
         )
 
         return Response({

@@ -1,73 +1,58 @@
+
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 from .models import Customer
 
 
 class CustomerListSerializer(serializers.ModelSerializer):
-    """Minimal fields for list views."""
     class Meta:
         model = Customer
-        fields = [
-            "id", "name", "phone", "email",
-            "address", "organization", "created_at", "is_deleted"
-        ]
+        fields = ["id", "name", "phone", "email", "address",
+                  "organization", "created_at", "is_deleted"]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
 class CustomerDetailSerializer(serializers.ModelSerializer):
-    """Full detail view."""
-    organization_name = serializers.CharField(
-        source="organization.name",
-        read_only=True,
-        default=None
-    )
+    organization_name = serializers.CharField(source="organization.name", read_only=True, default=None)
+    has_account = serializers.SerializerMethodField()
 
     class Meta:
         model = Customer
-        fields = [
-            "id", "name", "phone", "email", "address",
-            "gps_lat", "gps_lng", "organization", "organization_name",
-            "notes", "tags",
-            "created_at", "updated_at", "created_by", "updated_by",
-            "is_deleted", "deleted_at"
-        ]
-        read_only_fields = [
-            "id", "created_at", "updated_at",
-            "created_by", "updated_by", "is_deleted", "deleted_at"
-        ]
+        fields = ["id", "name", "phone", "email", "address",
+                  "gps_lat", "gps_lng", "organization", "organization_name",
+                  "notes", "tags", "user", "has_account",
+                  "created_at", "updated_at", "created_by", "updated_by",
+                  "is_deleted", "deleted_at"]
+        read_only_fields = ["id", "user", "created_at", "updated_at",
+                            "created_by", "updated_by", "is_deleted", "deleted_at"]
+
+    def get_has_account(self, obj):
+        return obj.user_id is not None
 
 
 class CustomerCreateUpdateSerializer(serializers.ModelSerializer):
-    """For creation and updates – requires phone uniqueness."""
-    phone = serializers.CharField(
-        max_length=20,
-        validators=[UniqueValidator(queryset=Customer.objects.all())]
-    )
-
     class Meta:
         model = Customer
-        fields = [
-            "name", "phone", "email", "address",
-            "gps_lat", "gps_lng", "organization",
-            "notes", "tags"
-        ]
+        fields = ["name", "phone", "email", "address",
+                  "gps_lat", "gps_lng", "organization", "notes", "tags"]
 
     def validate_phone(self, value):
-        # Ensure phone is unique (excluding soft-deleted)
-        if Customer.objects.filter(phone=value, is_deleted=False).exists():
+        value = (value or "").strip()
+        qs = Customer.objects.filter(phone=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
             raise serializers.ValidationError("A customer with this phone already exists.")
         return value
 
     def create(self, validated_data):
-        # Set created_by from context
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            validated_data["created_by"] = request.user
+        req = self.context.get("request")
+        if req and getattr(req.user, "is_authenticated", False):
+            validated_data["created_by"] = req.user
+            validated_data["updated_by"] = req.user
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        # Set updated_by
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            validated_data["updated_by"] = request.user
+        req = self.context.get("request")
+        if req and getattr(req.user, "is_authenticated", False):
+            validated_data["updated_by"] = req.user
         return super().update(instance, validated_data)

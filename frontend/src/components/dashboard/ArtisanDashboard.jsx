@@ -2,446 +2,546 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getArtisanDashboard } from '../../api/dashboardAPI';
 import { acceptAssignment } from '../../api/assignmentsAPI';
-import { Link } from 'react-router-dom';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  FaThLarge,
+  FaRegEdit,
+  FaRegClipboard,
+  FaBookOpen,
+  FaLock,
+  FaChevronRight,
+  FaCheckCircle,
+  FaBolt,
+  FaStar,
+  FaClock,
+  FaCircleNotch,
+  FaShieldAlt,
+  FaArrowUp,
+  FaPlay,
+  FaTools,
+  FaSignOutAlt,
+} from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import './Artisandashboard.css';
 
-// ─── Icons ──────────────────────────────────────────────────
-const IconClipboardList = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <rect x="6" y="4" width="12" height="17" rx="2" />
-    <path d="M9 4V3a1 1 0 011-1h4a1 1 0 011 1v1" />
-    <path d="M9 11h6M9 15h4" />
-  </svg>
-);
-const IconClock = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3.5 2" />
-  </svg>
-);
-const IconRefresh = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <path d="M4 4v6h6" />
-    <path d="M20 20v-6h-6" />
-    <path d="M5 14a8 8 0 0014.9 2M19 10A8 8 0 004.1 8" />
-  </svg>
-);
-const IconCheckCircle = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M8.5 12.5l2.5 2.5 5-5" />
-  </svg>
-);
-const IconCalendar = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <rect x="3" y="5" width="18" height="16" rx="2" />
-    <path d="M8 3v4M16 3v4M3 10h18" />
-  </svg>
-);
-const IconGauge = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <path d="M12 20a8 8 0 10-8-8" />
-    <path d="M12 12l3-4" />
-    <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-  </svg>
-);
-const IconArrowRight = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
-    <path d="M5 12h14M13 6l6 6-6 6" />
-  </svg>
-);
-const IconUser = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <circle cx="12" cy="8" r="4" />
-    <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" />
-  </svg>
-);
-const IconAlertCircle = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 8v5M12 16h.01" />
-  </svg>
-);
-const IconLogout = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-    <path d="M16 17l5-5-5-5" />
-    <path d="M21 12H9" />
-  </svg>
-);
-const IconCheck = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
-    <path d="M5 13l4 4L19 7" />
-  </svg>
-);
-
-// ─── Additional icons for new metrics ──────────────────────
-const IconStar = (props) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-    <path d="M12 2.5l2.9 6.2 6.6.6-5 4.5 1.5 6.6L12 17l-5.9 3.4L7.6 13.8l-5-4.5 6.6-.6L12 2.5z" />
-  </svg>
-);
-const IconDollarSign = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <path d="M12 2v20M8 8h6a3 3 0 010 6h-4a3 3 0 010-6h6" />
-  </svg>
-);
-const IconBriefcase = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <rect x="3" y="7" width="18" height="13" rx="2" />
-    <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-  </svg>
-);
-const IconTimer = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 2" />
-    <path d="M16 3l-2 2M8 3l2 2" />
-    <path d="M9 14l2 2 4-4" />
-  </svg>
-);
-
 // ─── Helpers ──────────────────────────────────────────────
 const rateColor = (percent) => {
-  if (percent >= 70) return { color: '#22c55e', soft: 'rgba(34, 197, 94, 0.12)' };
-  if (percent >= 40) return { color: '#eab308', soft: 'rgba(234, 179, 8, 0.12)' };
+  if (percent >= 70) return { color: '#10b981', soft: 'rgba(16, 185, 129, 0.12)' };
+  if (percent >= 40) return { color: '#f59e0b', soft: 'rgba(245, 158, 11, 0.12)' };
   return { color: '#ef4444', soft: 'rgba(239, 68, 68, 0.12)' };
 };
 
-const STATUS_COLORS = {
-  pending: '#f59e0b',
-  assigned: '#60a5fa',
-  in_progress: '#8b5cf6',
-  'in progress': '#8b5cf6',
-  completed: '#22c55e',
-  cancelled: '#f87171',
+const STATUS_LABEL = {
+  pending: { label: 'Pending', color: '#f59e0b', soft: 'rgba(245, 158, 11, 0.12)' },
+  assigned: { label: 'Assigned', color: '#6366f1', soft: 'rgba(99, 102, 241, 0.12)' },
+  in_progress: { label: 'In progress', color: '#8b5cf6', soft: 'rgba(139, 92, 246, 0.12)' },
+  'in progress': { label: 'In progress', color: '#8b5cf6', soft: 'rgba(139, 92, 246, 0.12)' },
+  completed: { label: 'Completed', color: '#10b981', soft: 'rgba(16, 185, 129, 0.12)' },
+  cancelled: { label: 'Cancelled', color: '#ef4444', soft: 'rgba(239, 68, 68, 0.12)' },
 };
-const getStatusColor = (status) =>
-  STATUS_COLORS[(status || '').toLowerCase()] || '#94a3b8';
 
-const StatCard = ({ icon: Icon, color, value, label }) => (
-  <div className="stat-card">
-    <div className="stat-card__icon-wrap" style={{ '--stat-color': color }}>
-      <Icon className="stat-card__icon" />
-    </div>
-    <div className="stat-card__body">
-      <div className="stat-card__value">{value}</div>
-      <div className="stat-card__label">{label}</div>
-    </div>
-  </div>
-);
+const getStatusMeta = (status) => {
+  const key = (status || '').toLowerCase();
+  return (
+    STATUS_LABEL[key] || {
+      label: status || '—',
+      color: '#64748b',
+      soft: 'rgba(100, 116, 139, 0.12)',
+    }
+  );
+};
+
+// Flat nav — matches the Ayuda sidebar style
+const NAV_ITEMS = [
+  { to: '/artisan/dashboard', label: 'Dashboard', icon: FaThLarge, end: true },
+  { to: '/artisan/profile', label: 'My details', icon: FaRegEdit },
+  { to: '/provider/test-centre', label: 'Test centre', icon: FaRegClipboard },
+  { to: '/provider/training-centre', label: 'Training centre', icon: FaBookOpen, locked: true },
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+};
 
 export const ArtisanDashboard = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   };
-  const queryClient = useQueryClient();
 
-  // ─── Main Dashboard Data ──────────────────────────────────
   const { data, isLoading, error } = useQuery({
     queryKey: ['artisanDashboard'],
     queryFn: () => getArtisanDashboard().then((res) => res.data),
     staleTime: 5 * 60 * 1000,
   });
 
-  // ─── Accept Assignment Mutation ──────────────────────────
   const acceptMutation = useMutation({
-    mutationFn: (assignmentId) => acceptAssignment(assignmentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['artisanDashboard']);
-    },
-    onError: (err) => {
-      console.error('Failed to accept assignment:', err);
-    },
+    mutationFn: (id) => acceptAssignment(id),
+    onSuccess: () => queryClient.invalidateQueries(['artisanDashboard']),
+    onError: (err) => console.error('Failed to accept assignment:', err),
   });
 
-  const handleAccept = (assignmentId) => {
+  const handleAccept = (id) => {
     if (window.confirm('Accept this job assignment?')) {
-      acceptMutation.mutate(assignmentId);
+      acceptMutation.mutate(id);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="artisan-dashboard">
-        <div className="profile-skeleton" />
-        <div className="stat-grid">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="stat-skeleton" />
-          ))}
-        </div>
-        <div className="panel-skeleton" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="artisan-dashboard">
-        <div className="state-banner state-banner--error">
-          <IconAlertCircle className="state-banner__icon" />
-          <p>Couldn&apos;t load your dashboard. Try refreshing the page.</p>
-        </div>
-      </div>
-    );
-  }
 
   const summary = data?.summary || {};
   const artisan = data?.artisan || {};
   const currentAssignment = data?.current_assignment;
   const recentAssignments = data?.recent_assignments || [];
 
-  // ─── Profile picture / name ──────────────────────────────
   const avatarUrl = artisan.profile_picture || null;
-  const fullName = artisan.full_name || artisan.name || 'Artisan';
-  const email = artisan.email || '';
+  const fullName = artisan.full_name || artisan.name || user?.full_name || 'Artisan';
+  const firstName = fullName.split(' ')[0] || 'Artisan';
   const role = 'Artisan';
 
   const completionRate = summary.completion_rate || 0;
-  const { color, soft } = rateColor(completionRate);
+  const { color: rateCol } = rateColor(completionRate);
   const completed = summary.completed || 0;
   const totalAssignments = summary.total_assignments || 0;
+  const pending = summary.pending || 0;
+  const inProgress = summary.in_progress || 0;
 
-  // ─── Metrics ──────────────────────────────────────────────
   const averageRating = summary.average_rating || 0;
   const totalEarnings = summary.total_earnings || 0;
   const currentWorkload = summary.current_workload || 0;
   const maxWorkload = artisan.max_concurrent_jobs || 5;
-  const workloadPercent = maxWorkload > 0 ? Math.min(100, (currentWorkload / maxWorkload) * 100) : 0;
+
   const onTimeRate = summary.on_time_rate || 0;
 
-  const canAccept = currentAssignment &&
+  const canAccept =
+    currentAssignment &&
     ['pending', 'assigned'].includes(currentAssignment.status?.toLowerCase());
 
+  const currentStatus = currentAssignment ? getStatusMeta(currentAssignment.status) : null;
+
+  // Pipeline steps (adapted from Ayuda's verification pipeline)
+  const pipeline = [
+    {
+      key: 'registration',
+      title: 'Registration',
+      subtitle: 'Provide your professional & account details for payments',
+      state: 'complete',
+    },
+    {
+      key: 'verification',
+      title: 'Identity verification',
+      subtitle: 'Upload your ID and address documents for review',
+      state: currentAssignment ? 'ongoing' : 'pending',
+    },
+    {
+      key: 'training',
+      title: 'Training centre',
+      subtitle: 'Complete the onboarding training modules',
+      state: 'locked',
+    },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="ay-layout">
+        <aside className="ay-sidebar">
+          <div className="ay-sidebar__brand">
+            <div className="ay-sidebar__logo">
+              <span className="ay-sidebar__logo-mark" />
+              <span className="ay-sidebar__logo-text">tumakonect</span>
+            </div>
+            <p className="ay-sidebar__brand-sub">…here to help</p>
+          </div>
+          <div className="ay-skel ay-skel--nav" />
+          <div className="ay-skel ay-skel--nav" />
+          <div className="ay-skel ay-skel--nav" />
+        </aside>
+        <main className="ay-main">
+          <div className="ay-loading">
+            <FaCircleNotch className="ay-loading__spin" />
+            <span>Loading your portal…</span>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="ay-layout">
+        <aside className="ay-sidebar">
+          <div className="ay-sidebar__brand">
+            <div className="ay-sidebar__logo">
+              <span className="ay-sidebar__logo-mark" />
+              <span className="ay-sidebar__logo-text">tumakonect</span>
+            </div>
+            <p className="ay-sidebar__brand-sub">…here to help</p>
+          </div>
+        </aside>
+        <main className="ay-main">
+          <div className="ay-error">
+            <FaShieldAlt />
+            <div>
+              <strong>Couldn&apos;t load your dashboard</strong>
+              <p>Try refreshing the page or check your connection.</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="artisan-dashboard">
-      {/* ─── Header ──────────────────────────────────────────── */}
-      <header className="dashboard-header">
-        <div className="agent-profile">
-          <div className="agent-profile__avatar">
+    <div className="ay-layout">
+      {/* ─── Sidebar ──────────────────────────────────────── */}
+      <aside className="ay-sidebar">
+        <div className="ay-sidebar__brand">
+          <div className="ay-sidebar__logo">
+            <span className="ay-sidebar__logo-mark" />
+            <span className="ay-sidebar__logo-text">tumakonect</span>
+          </div>
+          <p className="ay-sidebar__brand-sub">…here to help</p>
+          <p className="ay-sidebar__brand-title">Service provider portal</p>
+        </div>
+
+        <nav className="ay-nav" aria-label="Primary">
+          {NAV_ITEMS.map(({ to, label, icon: Icon, end, locked }) => (
+            <Link
+              key={to}
+              to={locked ? '#' : to}
+              end={end}
+              className={({ isActive }) =>
+                `ay-nav__item ${isActive && !locked ? 'is-active' : ''} ${
+                  locked ? 'is-locked' : ''
+                }`
+              }
+              onClick={(e) => locked && e.preventDefault()}
+            >
+              <span className="ay-nav__icon">
+                <Icon />
+              </span>
+              <span className="ay-nav__label">{label}</span>
+              {locked && <FaLock className="ay-nav__lock" />}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ay-sidebar__footer">
+          <div className="ay-sidebar__avatar">
             {avatarUrl ? (
               <img src={avatarUrl} alt={fullName} />
             ) : (
-              <div className="agent-profile__initial">{fullName.charAt(0).toUpperCase()}</div>
+              <span>{firstName.charAt(0).toUpperCase()}</span>
             )}
+            <span className="ay-sidebar__avatar-dot" aria-hidden="true" />
           </div>
-          <div className="agent-profile__info">
-            <h2 className="agent-profile__name">{fullName}</h2>
-            <div className="agent-profile__meta">
-              <span className="agent-profile__role">{role}</span>
-              {email && (
-                <>
-                  <span className="agent-profile__dot" aria-hidden="true" />
-                  <span className="agent-profile__email">{email}</span>
-                </>
-              )}
-            </div>
+          <div className="ay-sidebar__profile">
+            <strong>{fullName}</strong>
+            <span>{role}</span>
           </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="ay-sidebar__chev"
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <FaSignOutAlt />
+          </button>
         </div>
-        <h1 className="artisan-dashboard__title">Artisan Dashboard</h1>
-        <button type="button" onClick={handleLogout} className="logout-btn">
-          <IconLogout className="logout-btn__icon" />
-          Log out
-        </button>
-      </header>
+      </aside>
 
-      {/* ─── Stat Cards ────────────────────────────────────── */}
-      <div className="stat-grid">
-        <StatCard icon={IconClipboardList} color="#3b82f6" value={totalAssignments} label="Total assignments" />
-        <StatCard icon={IconClock} color="#eab308" value={summary.pending || 0} label="Pending" />
-        <StatCard icon={IconRefresh} color="#8b5cf6" value={summary.in_progress || 0} label="In progress" />
-        <StatCard icon={IconCheckCircle} color="#22c55e" value={completed} label="Completed" />
-        <StatCard icon={IconCalendar} color="#6366f1" value={summary.today_assignments || 0} label="Today's assignments" />
-        <StatCard icon={IconStar} color="#f59e0b" value={averageRating > 0 ? averageRating.toFixed(1) : '—'} label="Avg rating" />
-        <StatCard icon={IconDollarSign} color="#22c55e" value={totalEarnings > 0 ? `₵${totalEarnings.toFixed(2)}` : '—'} label="Total earnings" />
-        <StatCard icon={IconTimer} color="#06b6d4" value={onTimeRate > 0 ? `${onTimeRate}%` : '—'} label="On-time rate" />
-      </div>
-
-      {/* ─── Completion Rate Panel ────────────────────────── */}
-      <div className="progress-panel">
-        <div className="progress-panel__top">
-          <div>
-            <p className="progress-panel__label">Completion Rate</p>
-            <p className="progress-panel__value">{completionRate}%</p>
-            <p className="progress-panel__subtitle">{completed} of {totalAssignments} assignments completed</p>
-          </div>
-          <div className="progress-panel__badge" style={{ '--rate-color': color, '--rate-soft': soft }}>
-            <IconGauge />
-          </div>
-        </div>
-        <div className="progress-panel__track">
-          <div
-            className="progress-panel__fill"
-            style={{ width: `${Math.min(100, Math.max(0, completionRate))}%`, '--rate-color': color }}
-          />
-          <div
-            className="progress-panel__dot"
-            style={{ left: `${Math.min(100, Math.max(0, completionRate))}%`, '--rate-color': color }}
-          />
-        </div>
-      </div>
-
-      {/* ─── Workload Capacity Panel ────────────────────────── */}
-      <div className="progress-panel">
-        <div className="progress-panel__top">
-          <div>
-            <p className="progress-panel__label">Workload capacity</p>
-            <p className="progress-panel__value">
-              {currentWorkload} / {maxWorkload}
-            </p>
-            <p className="progress-panel__subtitle">
-              {maxWorkload - currentWorkload} slots available
-            </p>
-          </div>
-          <div className="progress-panel__badge" style={{ '--rate-color': '#6366f1', '--rate-soft': 'rgba(99, 102, 241, 0.12)' }}>
-            <IconBriefcase />
-          </div>
-        </div>
-        <div className="progress-panel__track">
-          <div
-            className="progress-panel__fill"
-            style={{
-              width: `${workloadPercent}%`,
-              '--rate-color': workloadPercent >= 80 ? '#ef4444' : workloadPercent >= 50 ? '#eab308' : '#6366f1'
-            }}
-          />
-          <div
-            className="progress-panel__dot"
-            style={{
-              left: `${workloadPercent}%`,
-              '--rate-color': workloadPercent >= 80 ? '#ef4444' : workloadPercent >= 50 ? '#eab308' : '#6366f1'
-            }}
-          />
-        </div>
-      </div>
-
-      {/* ─── Current Assignment ────────────────────────────── */}
-      {currentAssignment ? (
-        <div className="panel">
-          <div className="panel__header">
-            <h3 className="panel__title">Current assignment</h3>
-            <span className="live-pill">
-              <span className="live-pill__dot" aria-hidden="true" />
-              Active
-            </span>
-          </div>
-          <dl className="assignment-meta">
-            <div className="assignment-meta__row">
-              <dt>Incident</dt>
-              <dd>{currentAssignment.incident_number}</dd>
+      {/* ─── Main ─────────────────────────────────────────── */}
+      <main className="ay-main">
+        <motion.div
+          className="ay-main__inner"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          {/* Hero */}
+          <motion.header className="ay-hero" variants={itemVariants}>
+            <div className="ay-hero__left">
+              <h1>
+                Welcome, <span className="ay-hero__name">{firstName}</span>
+              </h1>
+              <p>Everything is set for your next professional move.</p>
             </div>
-            <div className="assignment-meta__row">
-              <dt>Customer</dt>
-              <dd>
-                <IconUser className="assignment-meta__icon" />
-                {currentAssignment.customer}
-              </dd>
-            </div>
-            <div className="assignment-meta__row">
-              <dt>Status</dt>
-              <dd>
-                <span
-                  className="status-pill"
-                  style={{ '--status-color': getStatusColor(currentAssignment.status) }}
-                >
-                  {currentAssignment.status}
-                </span>
-              </dd>
-            </div>
-            {currentAssignment.assigned_at && (
-              <div className="assignment-meta__row">
-                <dt>Assigned</dt>
-                <dd>{new Date(currentAssignment.assigned_at).toLocaleString()}</dd>
+
+            <div className="ay-hero__phase">
+              <span className="ay-phase__dot" />
+              <div>
+                <span className="ay-phase__label">Current phase</span>
+                <strong className="ay-phase__value">
+                  {totalAssignments > 0 ? 'Testing' : 'Onboarding'}
+                </strong>
               </div>
-            )}
-          </dl>
-
-          {canAccept && (
-            <div className="assignment-actions">
-              <button
-                type="button"
-                onClick={() => handleAccept(currentAssignment.id)}
-                disabled={acceptMutation.isPending}
-                className="btn btn-success accept-btn"
-              >
-                {acceptMutation.isPending ? (
-                  <>
-                    <span className="spinner" aria-hidden="true" />
-                    Accepting…
-                  </>
-                ) : (
-                  <>
-                    <IconCheck className="accept-btn__icon" />
-                    Accept Job
-                  </>
-                )}
-              </button>
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="panel">
-          <div className="empty-state">
-            <IconCheckCircle className="empty-state__icon" />
-            <p>No active assignment right now. Check back later, or take a well-earned break.</p>
-          </div>
-        </div>
-      )}
+          </motion.header>
 
-      {/* ─── Recent Assignments ────────────────────────────── */}
-      <div className="panel">
-        <div className="panel__header">
-          <h3 className="panel__title">Recent assignments</h3>
-          <span className="panel__count">{recentAssignments.length}</span>
-        </div>
+          {/* Stat cards */}
+          <motion.section className="ay-stats" variants={itemVariants}>
+            <article className="ay-stat ay-stat--blue">
+              <div className="ay-stat__top">
+                <span className="ay-stat__icon">
+                  <FaArrowUp />
+                </span>
+                <span className="ay-stat__pill ay-stat__pill--blue">
+                  {totalEarnings > 0 ? '+12%' : 'NEW'}
+                </span>
+              </div>
+              <p className="ay-stat__label">Avg. monthly earnings</p>
+              <p className="ay-stat__value">
+                GH₵{totalEarnings > 0 ? totalEarnings.toFixed(2) : '0.00'}
+              </p>
+            </article>
 
-        {recentAssignments.length === 0 ? (
-          <div className="empty-state">
-            <IconClipboardList className="empty-state__icon" />
-            <p>No assignments yet. They will appear here once you are assigned.</p>
-          </div>
-        ) : (
-          <>
-            <ul className="call-list">
-              {recentAssignments.map((assignment) => (
-                <li key={assignment.id} className="call-row">
-                  <div className="call-row__ref">
-                    <Link to={`/incidents/${assignment.incident_id}`} className="call-row__link">
-                      {assignment.incident_number}
-                    </Link>
-                    <span className="call-row__customer">– {assignment.customer || 'No customer'}</span>
-                  </div>
-                  <span className="call-row__time">
-                    <span
-                      className="status-pill"
-                      style={{ '--status-color': getStatusColor(assignment.status) }}
-                    >
-                      {assignment.status}
+            <article className="ay-stat ay-stat--orange">
+              <div className="ay-stat__top">
+                <span className="ay-stat__icon ay-stat__icon--orange">
+                  <FaStar />
+                </span>
+                <span className="ay-stat__pill ay-stat__pill--orange">
+                  {averageRating > 0 ? 'LIVE' : 'NEW'}
+                </span>
+              </div>
+              <p className="ay-stat__label">Overall rating</p>
+              <p className="ay-stat__value">
+                {averageRating > 0 ? averageRating.toFixed(1) : '0'}
+              </p>
+            </article>
+
+            <article className="ay-stat ay-stat--green">
+              <div className="ay-stat__top">
+                <span className="ay-stat__icon ay-stat__icon--green">
+                  <FaCheckCircle />
+                </span>
+                <span className="ay-stat__pill ay-stat__pill--green">
+                  {onTimeRate > 0 ? `${onTimeRate}% on time` : 'READY'}
+                </span>
+              </div>
+              <p className="ay-stat__label">Completed ayúdas</p>
+              <p className="ay-stat__value">{completed}</p>
+            </article>
+          </motion.section>
+
+          {/* Bottom grid */}
+          <motion.section className="ay-grid" variants={itemVariants}>
+            {/* Pipeline */}
+            <div className="ay-panel">
+              <div className="ay-panel__head">
+                <span className="ay-panel__icon">
+                  <FaShieldAlt />
+                </span>
+                <h2>Profile pipeline</h2>
+              </div>
+
+              <ul className="ay-pipeline">
+                {pipeline.map((step) => (
+                  <li key={step.key} className={`ay-pipeline__item is-${step.state}`}>
+                    <span className="ay-pipeline__badge">
+                      {step.state === 'complete' ? (
+                        <FaCheckCircle />
+                      ) : step.state === 'ongoing' ? (
+                        <FaCircleNotch className="ay-pipeline__spin" />
+                      ) : (
+                        <FaLock />
+                      )}
                     </span>
-                    {assignment.assigned_at && (
-                      <span className="call-row__date">
-                        {new Date(assignment.assigned_at).toLocaleDateString()}
+                    <div className="ay-pipeline__body">
+                      <strong>{step.title}</strong>
+                      <span>{step.subtitle}</span>
+                    </div>
+                    <span className="ay-pipeline__status">
+                      {step.state === 'complete'
+                        ? 'Complete'
+                        : step.state === 'ongoing'
+                        ? 'Ongoing'
+                        : 'Locked'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Secondary metrics */}
+              <div className="ay-mini-grid">
+                <div className="ay-mini">
+                  <span className="ay-mini__label">
+                    <FaRegClipboard /> Total assignments
+                  </span>
+                  <span className="ay-mini__value">{totalAssignments}</span>
+                </div>
+                <div className="ay-mini">
+                  <span className="ay-mini__label">
+                    <FaClock /> Pending
+                  </span>
+                  <span className="ay-mini__value">{pending}</span>
+                </div>
+                <div className="ay-mini">
+                  <span className="ay-mini__label">
+                    <FaPlay /> In progress
+                  </span>
+                  <span className="ay-mini__value">{inProgress}</span>
+                </div>
+                <div className="ay-mini">
+                  <span className="ay-mini__label">
+                    <FaTools /> Workload
+                  </span>
+                  <span className="ay-mini__value">
+                    {currentWorkload}/{maxWorkload}
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="ay-progress">
+                <div className="ay-progress__head">
+                  <span>Completion rate</span>
+                  <strong>{completionRate}%</strong>
+                </div>
+                <div className="ay-progress__track">
+                  <div
+                    className="ay-progress__fill"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, completionRate))}%`,
+                      background: rateCol,
+                    }}
+                  />
+                </div>
+                <p className="ay-progress__hint">
+                  {completed} of {totalAssignments} assignments completed
+                </p>
+              </div>
+            </div>
+
+            {/* Active milestone */}
+            <div className="ay-milestone">
+              <div className="ay-milestone__head">
+                <FaBolt />
+                <span>Active milestone</span>
+              </div>
+
+              <div className="ay-milestone__body">
+                <span className="ay-milestone__step">
+                  Step {currentAssignment ? 2 : 1} of 4
+                </span>
+                <h3>
+                  {currentAssignment
+                    ? currentAssignment.incident_number
+                    : 'Accept your first assignment'}
+                </h3>
+                <p>
+                  {currentAssignment
+                    ? `Assigned to ${currentAssignment.customer || 'a customer'}`
+                    : 'Once an incident is assigned to you, it will appear here.'}
+                </p>
+
+                {currentAssignment && currentStatus && (
+                  <div className="ay-milestone__meta">
+                    <span
+                      className="ay-milestone__status"
+                      style={{ '--status-color': currentStatus.color }}
+                    >
+                      <span className="ay-milestone__status-dot" />
+                      {currentStatus.label}
+                    </span>
+                    {currentAssignment.assigned_at && (
+                      <span className="ay-milestone__date">
+                        {new Date(currentAssignment.assigned_at).toLocaleDateString()}
                       </span>
                     )}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="view-all-row">
-              {/* ✅ Link now points to artisan's own assignments */}
-              <Link to="/assignments/my" className="view-all-link">
-                View all <IconArrowRight className="view-all-link__icon" />
-              </Link>
+                  </div>
+                )}
+              </div>
+
+              {canAccept ? (
+                <button
+                  type="button"
+                  className="ay-milestone__cta"
+                  onClick={() => handleAccept(currentAssignment.id)}
+                  disabled={acceptMutation.isPending}
+                >
+                  {acceptMutation.isPending ? (
+                    <>
+                      <FaCircleNotch className="ay-pipeline__spin" />
+                      Accepting…
+                    </>
+                  ) : (
+                    <>
+                      <FaCheckCircle />
+                      Accept job
+                    </>
+                  )}
+                </button>
+              ) : (
+                <Link to="/assignments/my" className="ay-milestone__cta">
+                  View my assignments
+                  <FaChevronRight />
+                </Link>
+              )}
             </div>
-          </>
-        )}
-      </div>
+          </motion.section>
+
+          {/* Recent assignments */}
+          {recentAssignments.length > 0 && (
+            <motion.section className="ay-panel ay-panel--list" variants={itemVariants}>
+              <div className="ay-panel__head">
+                <span className="ay-panel__icon">
+                  <FaRegClipboard />
+                </span>
+                <h2>Recent assignments</h2>
+                <Link to="/assignments/my" className="ay-panel__more">
+                  View all <FaChevronRight />
+                </Link>
+              </div>
+
+              <ul className="ay-list">
+                {recentAssignments.slice(0, 5).map((a) => {
+                  const meta = getStatusMeta(a.status);
+                  return (
+                    <li key={a.id} className="ay-list__row">
+                      <Link
+                        to={`/incidents/${a.incident || a.incident_id}`}
+                        className="ay-list__ref"
+                      >
+                        {a.incident_number}
+                      </Link>
+                      <span className="ay-list__customer">{a.customer || '—'}</span>
+                      <span
+                        className="ay-list__status"
+                        style={{ '--status-color': meta.color, '--status-soft': meta.soft }}
+                      >
+                        {meta.label}
+                      </span>
+                      {a.assigned_at && (
+                        <span className="ay-list__date">
+                          {new Date(a.assigned_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </motion.section>
+          )}
+
+          {/* Logout */}
+          <motion.div className="ay-signout" variants={itemVariants}>
+            <button type="button" onClick={handleLogout} className="ay-signout__btn">
+              Sign out of your account
+            </button>
+          </motion.div>
+        </motion.div>
+      </main>
     </div>
   );
 };
